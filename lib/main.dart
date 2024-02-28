@@ -5,6 +5,8 @@ import 'package:autowheelweb/Components/menuController.dart';
 import 'package:autowheelweb/Utils/Colors.dart';
 import 'package:autowheelweb/Utils/mediaquery.dart';
 import 'package:autowheelweb/desktop/followup.dart';
+import 'package:autowheelweb/desktop/prospect.dart';
+import 'package:autowheelweb/desktop/report.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +32,7 @@ class MyApp extends StatelessWidget {
               create: (_) => Classvaluechange()),
           ChangeNotifierProvider(create: (context) => MenuControlle())
         ],
-        child:  FollowUpScreen(value: true,),
+        child:  ReportScreen(),
       )
     );
   }

@@ -30,158 +30,147 @@ class _ProspectScreenState extends State<ProspectScreen> {
   String stateValue = "";
   String cityValue = "";
   var ischack = false;
-  TextEditingController nameController = TextEditingController();
-  TextEditingController soController = TextEditingController();
-  TextEditingController addresscontroller = TextEditingController();
-  TextEditingController pinController = TextEditingController();
-  TextEditingController mobileControleer = TextEditingController();
-  TextEditingController stdController = TextEditingController();
-  TextEditingController emailcontroller = TextEditingController();
-  TextEditingController schemeController = TextEditingController();
-  TextEditingController incomeController = TextEditingController();
-  TextEditingController remarksController = TextEditingController();
-  TextEditingController remarksController2 = TextEditingController();
-  TextEditingController splRemarks = TextEditingController();
+  final TextEditingController _customernameController = TextEditingController();
+  final TextEditingController _sonoffController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _pinController = TextEditingController();
+  final TextEditingController _mobileController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _schemeController = TextEditingController();
+  final TextEditingController _incomeController = TextEditingController();
+  final TextEditingController _intrestedremarksController = TextEditingController();
+  final TextEditingController _lastRemarkController = TextEditingController();
+  final TextEditingController _testRemarkController = TextEditingController();
+  final TextEditingController _specialRemarkController = TextEditingController();
 
-  TextEditingController datepickar1 = TextEditingController(
-    text: DateFormat('dd-MM-yyyy').format(DateTime.now()),
+
+//Date
+  TextEditingController refDatePicker = TextEditingController(
+    text: DateFormat('M/d/yyyy').format(DateTime.now()),
   );
-  TextEditingController datepickar2 = TextEditingController(
-    text: DateFormat('dd-MM-yyyy').format(DateTime.now()),
-  );
-  TextEditingController datepickar3 = TextEditingController(
-    text: DateFormat('dd-MM-yyyy').format(DateTime.now()),
-  );
-  TextEditingController datepickar4 = TextEditingController(
-    text: DateFormat('dd-MM-yyyy').format(DateTime.now()),
-  );
-  TextEditingController datepickar5 = TextEditingController(
-    text: DateFormat('dd-MM-yyyy').format(DateTime.now()),
+  TextEditingController dobDatePicker = TextEditingController(
+    text: DateFormat('M/d/yyyy').format(DateTime.now()),
   );
 
-  List<Map<String, dynamic>> drop = [
-    {'id': 0, 'name': 'Activity'}
-  ];
+  TextEditingController rideDatePickar = TextEditingController(
+    text: DateFormat('M/d/yyyy').format(DateTime.now()),
+  );
+  TextEditingController appointmentDatePickar = TextEditingController(
+    text: DateFormat('M/d/yyyy').format(DateTime.now()),
+  );
+
+
+  List<Map<String, dynamic>> drop = [  ];
   int? selecteddropId;
   Map<String, dynamic>? selecteddropValue;
   final TextEditingController dropController = TextEditingController();
-  List<Map<String, dynamic>> color = [
-    {'id': 0, 'name': 'Colors'}
-  ];
+
+  List<Map<String, dynamic>> color = [  ];
   int? selectedcolorsId;
   Map<String, dynamic>? selectedcolorValue;
   final TextEditingController colorController = TextEditingController();
   final TextEditingController color2Controller = TextEditingController();
 
-  List<Map<String, dynamic>> Enqtype = [
-    {'id': 0, 'name': 'Praven'}
-  ];
+  List<Map<String, dynamic>> Enqtype = [  ];
   int? selectedEnqtypeId;
   Map<String, dynamic>? selectedEnqtypeValue;
-
   final TextEditingController EnqtypeController = TextEditingController();
-  List<Map<String, dynamic>> Occuption = [
-    {'id': 0, 'name': 'Bussniss'}
-  ];
+
+  List<Map<String, dynamic>> Occuption = [  ];
   int? selectedOccuptionId;
   Map<String, dynamic>? selectedOccuptionValue;
   final TextEditingController OccuptionController = TextEditingController();
+
 final TextEditingController testController = TextEditingController();
-  List<Map<String, dynamic>> Prionaity = [
-    {'id': 0, 'name': 'Prionaity'}
-  ];
-  String selectedPrionaityName = "Prionaity";
+
+
+  List<Map<String, dynamic>> Prionaity = [  ];
   int? selectedPrionaityId;
-  List<Map<String, dynamic>> product = [
-    {'id': 0, 'name': 'product'}
-  ];
-  String selectedproductName = "product";
+  String? selectedPrionaityName;
+  // final TextEditingController priorityController = TextEditingController();
+  List<Map<String, dynamic>> product = [  ];
+  String? selectedproductName;
   int? selectedproductId;
-  List<Map<String, dynamic>> Test = [
-    {'id': 0, 'name': 'Test'}
-  ];
+  List<Map<String, dynamic>> Test = [  ];
   Map<String, dynamic>? selectedtestValue;
-  int testId = 0;
-  List<Map<String, dynamic>> title = [
-    {'id': 0, 'name': 'Mr.'}
-  ];
+  int? testId;
+
+  List<Map<String, dynamic>> title = [ {'id': 0, 'name': 'Mr.'},{'id': 1, 'name': 'Mrs.'},{'id': 2, 'name': 'Dr.'},{'id': 3, 'name': 'M/S'}];
   String selectedtitleName = "Mr.";
-  int? selectedtitleId;
+  int selectedtitleId = 0;
+
   List<String> options = [];
   List<Staffmodel> staffList = [];
   String staffName = "John Doe";
   String selectedStaffId = '';
-  Future<void> _selectTime1(BuildContext context) async {
+
+
+  //Time
+  late TimeOfDay selectedTimeRefence;
+  late TimeOfDay selectedTimeAppointment;
+  Future<void> _selectTimeReference(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: selectedTime1,
+      initialTime: selectedTimeRefence,
     );
-    if (picked != null && picked != selectedTime1) {
+    if (picked != null && picked != selectedTimeRefence) {
       setState(() {
-        selectedTime1 = picked;
+        selectedTimeRefence = picked;
       });
     }
   }
-
-  Future<void> _selectTime2(BuildContext context) async {
+  Future<void> _selectTimeAppointment(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: selectedTime2,
+      initialTime: selectedTimeAppointment,
     );
-    if (picked != null && picked != selectedTime2) {
+    if (picked != null && picked != selectedTimeAppointment) {
       setState(() {
-        selectedTime2 = picked;
+        selectedTimeAppointment = picked;
       });
     }
   }
-
-  late TimeOfDay selectedTime1;
-  late TimeOfDay selectedTime2;
   void startTimer() {
     Timer.periodic(const Duration(minutes: 1), (Timer timer) {
       setState(() {
-        selectedTime1 = TimeOfDay.now();
-        selectedTime2 = TimeOfDay.now();
+        selectedTimeRefence = TimeOfDay.now();
+        selectedTimeAppointment = TimeOfDay.now();
       });
     });
   }
 
-  List<String> detailsList1 = [];
+
+  List<String> datailsList1 = [];
   bool isLoading = false;
   TextEditingController refController = TextEditingController();
-  int selectedId3 = 0;
-  var locationId;
+  int ? locationId;
   List<Map<String, dynamic>> locationList = [];
   @override
   void initState() {
     super.initState();
-    selectedTime1 = TimeOfDay.now();
-    selectedTime2 = TimeOfDay.now();
+    selectedTimeRefence = TimeOfDay.now();
+    selectedTimeAppointment = TimeOfDay.now();
     startTimer();
-    selectedTime2;
     location();
     staff();
-    sourceDeta();
-    colorDeta();
-    enqtypeDeta();
-    occuptionDeta();
-    prionaityDeta();
-    productDeta();
-    TestDeta();
-    titleDeta();
+    sourceData();
+    colorData();
+    enqtypeData();
+    occuptionData();
+    prionaityData();
+    productData();
+    testData();
     _fetchRefNo();
-    postProspect();
   }
 
   refreshData() {
-    sourceDeta();
-    colorDeta();
-    enqtypeDeta();
-    occuptionDeta();
-    prionaityDeta();
-    productDeta();
-    TestDeta();
-    titleDeta();
+    sourceData();
+    colorData();
+    enqtypeData();
+    occuptionData();
+    prionaityData();
+    productData();
+    testData();
     _fetchRefNo();
   }
 
@@ -210,9 +199,9 @@ final TextEditingController testController = TextEditingController();
             children: [
               dropdownTextfield(
                 "Select Location",
-                localDropdownButton(
+                localDropdownButton("Select a Location",
                   context,
-                  selectedId3,
+                  locationId,
                   locationList.map((value) {
                     return DropdownMenuItem(
                       value: value['id'],
@@ -225,8 +214,7 @@ final TextEditingController testController = TextEditingController();
                   }).toList(),
                   (value) {
                     setState(() {
-                      selectedId3 = value as int;
-                      locationId = selectedId3;
+                      locationId = value as int;
                       _fetchRefNo(); // Fetch reference number after location selection
                     });
                   },
@@ -256,8 +244,8 @@ final TextEditingController testController = TextEditingController();
                           lastDate: DateTime.now(),
                         ).then((selectedDate) {
                           if (selectedDate != null) {
-                            datepickar1.text =
-                                DateFormat('dd-MM-yyyy').format(selectedDate);
+                            refDatePicker.text =
+                                DateFormat('M/d/yyyy').format(selectedDate);
                           }
                         });
                       },
@@ -265,7 +253,7 @@ final TextEditingController testController = TextEditingController();
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            datepickar1.text,
+                            refDatePicker.text,
                             style: rubikTextStyle(
                                 16, FontWeight.w500, AppColor.colBlack),
                           ),
@@ -280,11 +268,11 @@ final TextEditingController testController = TextEditingController();
                     "Time of Reference",
                     InkWell(
                       onTap: () {
-                        _selectTime1(context);
+                        _selectTimeReference(context);
                       },
                       child: Center(
                         child: Text(
-                          selectedTime1.format(context),
+                          selectedTimeRefence.format(context),
                           style: rubikTextStyle(
                               16, FontWeight.w500, AppColor.colBlack),
                         ),
@@ -301,7 +289,7 @@ final TextEditingController testController = TextEditingController();
                     flex: 2,
                     child: dropdownTextfield(
                         "Title",
-                        localDropdownButton(
+                        localDropdownButton("",
                             context,
                             selectedtitleName,
                             title.map((item) {
@@ -330,14 +318,14 @@ final TextEditingController testController = TextEditingController();
                   Expanded(
                     flex: 5,
                     child:
-                        textformfiles(nameController, labelText: "Custom Name"),
+                        textformfiles(_customernameController, labelText: "Customer Name"),
                   ),
                 ],
               ),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(soController, labelText: "S/o"),
+              textformfiles(_sonoffController, labelText: "S/o"),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(addresscontroller, labelText: "Address"),
+              textformfiles(_addressController, labelText: "Address"),
               SizedBox(height: Sizes.height * 0.02),
               CSCPicker(
                 showStates: true,
@@ -348,15 +336,15 @@ final TextEditingController testController = TextEditingController();
                     color: AppColor.colWhite,
                     border: Border.all(
                       width: 1,
-                      color: AppColor.colBlack,
+                      color: AppColor.colBlack
                     )),
                 disabledDropdownDecoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                     color: AppColor.colWhite,
                     border: Border.all(color: AppColor.colBlack, width: 1)),
                 countryDropdownLabel: "Select Country",
-                stateDropdownLabel: " Select State",
-                cityDropdownLabel: " Select City",
+                stateDropdownLabel: "Select State",
+                cityDropdownLabel: "Select City",
                 selectedItemStyle:
                     rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),
                 dropdownHeadingStyle: TextStyle(
@@ -389,13 +377,13 @@ final TextEditingController testController = TextEditingController();
                 },
               ),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(pinController,
-                  labelText: "Pin", keyboardType: TextInputType.number),
+              textformfiles(_pinController,
+                  labelText: "Pin Code", keyboardType: TextInputType.number),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(mobileControleer,
-                  labelText: "Mobile*", keyboardType: TextInputType.number),
+              textformfiles(_mobileController,
+                  labelText: "Mobile Number", keyboardType: TextInputType.number),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(emailcontroller,
+              textformfiles(_emailController,
                   keyboardType: TextInputType.emailAddress, labelText: "Email"),
               SizedBox(height: Sizes.height * 0.02),
               dropdownTextfield(
@@ -411,8 +399,8 @@ final TextEditingController testController = TextEditingController();
                       lastDate: DateTime.now(),
                     ).then((selectedDate) {
                       if (selectedDate != null) {
-                        datepickar2.text =
-                            DateFormat('dd-MM-yyyy').format(selectedDate);
+                        dobDatePicker.text =
+                            DateFormat('M/d/yyyy').format(selectedDate);
                       }
                     });
                   },
@@ -420,7 +408,7 @@ final TextEditingController testController = TextEditingController();
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        datepickar2.text,
+                        dobDatePicker.text,
                         style: rubikTextStyle(
                             16, FontWeight.w500, AppColor.colBlack),
                       ),
@@ -436,7 +424,7 @@ final TextEditingController testController = TextEditingController();
                     child: dropdownTextfield(
                         'Select Enquery Type',
                         searchDropDown(
-                            'Enquery',
+                            'Select Enquery Type',
                             Enqtype.map((item) => DropdownMenuItem(
                                   onTap: () {
                                     selectedEnqtypeId = item['id'];
@@ -559,7 +547,7 @@ final TextEditingController testController = TextEditingController();
                       "Staff",
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: localDropdownButton(
+                          child: localDropdownButton( "Select Staff",
                               context,
                               selectedStaffId,
                               options.map<DropdownMenuItem<String>>(
@@ -594,7 +582,7 @@ final TextEditingController testController = TextEditingController();
                               child: ListBody(
                                 children: <Widget>[
                                   Text(
-                                      'It will work after some time. For more details you can contect us'),
+                                      'It will work after some time. For more datails you can contect us'),
                                 ],
                               ),
                             ),
@@ -676,9 +664,6 @@ final TextEditingController testController = TextEditingController();
                                     sourecID: 10,
                                     name: 'Source',
                                   ))).then((value) => refreshData());
-                      // Get.to(() => AddGroupScreen(sourecID: 10))!
-                      //     .then((value) => refreshData());
-                      // ?.then((value) => value ? GroupData : null);
                     },
                   )
                 ],
@@ -688,16 +673,14 @@ final TextEditingController testController = TextEditingController();
                 children: [
                   Expanded(
                       child: dropdownTextfield(
-                          "Prionarity",
-                          Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              child: localDropdownButton(
+                          "Priority",
+                         localDropdownButton( "Select Priority",
                                   context,
                                   selectedPrionaityName,
                                   Prionaity.map((item) {
                                     return DropdownMenuItem(
                                       value: item['name'],
+                                      
                                       child: Text(
                                         item['name'],
                                         style: rubikTextStyle(16,
@@ -715,7 +698,9 @@ final TextEditingController testController = TextEditingController();
                                       : null;
                                   log(selectedPrionaityId.toString());
                                 });
-                              })))),
+                              })
+                          )),
+               
                   SizedBox(width: Sizes.width * 0.04),
                   addDefaultButton(
                     () {
@@ -724,16 +709,16 @@ final TextEditingController testController = TextEditingController();
                           MaterialPageRoute(
                               builder: (context) => AddGroupScreen(
                                     sourecID: 22,
-                                    name: 'Prionarity',
+                                    name: 'Priority',
                                   ))).then((value) => refreshData());
                     },
                   )
                 ],
               ),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(schemeController, labelText: "Scheme"),
+              textformfiles(_schemeController, labelText: "Scheme"),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(incomeController, labelText: "Income"),
+              textformfiles(_incomeController, labelText: "Income"),
               SizedBox(height: Sizes.height * 0.05),
               Text(
                 "Intersted in following product",
@@ -747,7 +732,7 @@ final TextEditingController testController = TextEditingController();
                     "Product",
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: localDropdownButton(
+                      child: localDropdownButton( "Select Product",
                         context,
                         selectedproductName,
                         product.map((item) {
@@ -857,7 +842,7 @@ final TextEditingController testController = TextEditingController();
                 ],
               ),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(remarksController, labelText: "Remmarks"),
+              textformfiles(_intrestedremarksController, labelText: "Remarks"),
               SizedBox(height: Sizes.height * 0.05),
               Text(
                 "Test Ride",
@@ -938,8 +923,8 @@ final TextEditingController testController = TextEditingController();
                       lastDate: DateTime(2200),
                     ).then((selectedDate) {
                       if (selectedDate != null) {
-                        datepickar4.text =
-                            DateFormat('dd-MM-yyyy').format(selectedDate);
+                        rideDatePickar.text =
+                            DateFormat('M/d/yyyy').format(selectedDate);
                       }
                     });
                   },
@@ -947,7 +932,7 @@ final TextEditingController testController = TextEditingController();
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        datepickar4.text,
+                        rideDatePickar.text,
                         style: rubikTextStyle(
                             16, FontWeight.w500, AppColor.colBlack),
                       ),
@@ -957,7 +942,7 @@ final TextEditingController testController = TextEditingController();
                 ),
               ),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(remarksController2, labelText: "Remmarks"),
+              textformfiles(_testRemarkController, labelText: "Remarks"),
               SizedBox(height: Sizes.height * 0.05),
               Text(
                 "Appointment Date and Time*",
@@ -979,8 +964,8 @@ final TextEditingController testController = TextEditingController();
                             lastDate: DateTime(2200),
                           ).then((selectedDate) {
                             if (selectedDate != null) {
-                              datepickar5.text =
-                                  DateFormat('dd-MM-yyyy').format(selectedDate);
+                              appointmentDatePickar.text =
+                                  DateFormat('M/d/yyyy').format(selectedDate);
                             }
                           });
                         },
@@ -988,7 +973,7 @@ final TextEditingController testController = TextEditingController();
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              datepickar5.text,
+                              appointmentDatePickar.text,
                               style: rubikTextStyle(
                                   16, FontWeight.w500, AppColor.colBlack),
                             ),
@@ -1004,11 +989,11 @@ final TextEditingController testController = TextEditingController();
                     "Appointment Time",
                     InkWell(
                       onTap: () {
-                        _selectTime2(context);
+                        _selectTimeAppointment(context);
                       },
                       child: Center(
                         child: Text(
-                          selectedTime2.format(context),
+                          selectedTimeAppointment.format(context),
                           style: rubikTextStyle(
                               16, FontWeight.w500, AppColor.colBlack),
                         ),
@@ -1018,7 +1003,9 @@ final TextEditingController testController = TextEditingController();
                 ],
               ),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(splRemarks, labelText: "Special Remarks"),
+              textformfiles(_lastRemarkController, labelText: "Last Remarks"),
+             SizedBox(height: Sizes.height * 0.02),
+              textformfiles(_specialRemarkController, labelText: "Special Remarks"),
               Row(
                 children: [
                   SizedBox(
@@ -1094,7 +1081,7 @@ final TextEditingController testController = TextEditingController();
   }
 
   Future<void> fetchDataByMiscTypeId(int miscTypeId,
-      List<Map<String, dynamic>> listToUpdate, String defaultText) async {
+      List<Map<String, dynamic>> listToUpdate) async {
     final url = Uri.parse(
         'http://lms.muepetro.com/api/UserController1/GetMiscMaster?MiscTypeId=$miscTypeId');
     try {
@@ -1103,7 +1090,6 @@ final TextEditingController testController = TextEditingController();
         final List<Goruppartmodel> goruppartmodelList =
             grouppartmodelFromJson(response.body);
         listToUpdate.clear();
-        listToUpdate.add({'id': 0, 'name': defaultText});
         for (var item in goruppartmodelList) {
           listToUpdate.add({'id': item.id, 'name': item.name});
         }
@@ -1116,36 +1102,54 @@ final TextEditingController testController = TextEditingController();
     }
   }
 
-  Future<void> sourceDeta() async {
-    await fetchDataByMiscTypeId(10, drop, 'Activity');
+  Future<void> sourceData() async {
+    await fetchDataByMiscTypeId(10, drop,);
   }
 
-  Future<void> colorDeta() async {
-    await fetchDataByMiscTypeId(17, color, 'Colors');
+  Future<void> colorData() async {
+    await fetchDataByMiscTypeId(17, color,);
   }
 
-  Future<void> enqtypeDeta() async {
-    await fetchDataByMiscTypeId(18, Enqtype, 'Praven');
+  Future<void> enqtypeData() async {
+    await fetchDataByMiscTypeId(18, Enqtype,);
   }
 
-  Future<void> occuptionDeta() async {
-    await fetchDataByMiscTypeId(23, Occuption, 'Bussniss');
+  Future<void> occuptionData() async {
+    await fetchDataByMiscTypeId(23, Occuption,);
   }
 
-  Future<void> prionaityDeta() async {
-    await fetchDataByMiscTypeId(22, Prionaity, 'Prionaity');
+  // Future<void> prionaityData() async {
+  //   await fetchDataByMiscTypeId(22, Prionaity,);
+  // }
+    Future<void> prionaityData() async {
+    final url = Uri.parse(
+        'http://lms.muepetro.com/api/UserController1/GetMiscMaster?MiscTypeId=22');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<Goruppartmodel> goruppartmodelList =
+            grouppartmodelFromJson(response.body);
+            Prionaity.clear();
+        for (var item in goruppartmodelList) {
+          Prionaity.add({'id': item.id, 'name': item.name});
+        }
+        setState(() {});
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+        print('Response Data: ${response.body}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
-  Future<void> productDeta() async {
-    await fetchDataByMiscTypeId(19, product, 'product');
+
+  Future<void> productData() async {
+    await fetchDataByMiscTypeId(19, product,);
   }
 
-  Future<void> TestDeta() async {
-    await fetchDataByMiscTypeId(21, Test, 'Test');
-  }
-
-  Future<void> titleDeta() async {
-    await fetchDataByMiscTypeId(24, title, 'title');
+  Future<void> testData() async {
+    await fetchDataByMiscTypeId(21, Test,);
   }
 
   void postProspect() async {
@@ -1153,32 +1157,30 @@ final TextEditingController testController = TextEditingController();
         'http://lms.muepetro.com/api/UserController1/PostProspect';
     Map<String, dynamic> postData = {
       "Location_Id": locationId,
-      "Prefix_Name": "Online",
-      "Ref_No": int.parse(
-        refController.text.toString(),
-      ),
-      "Ref_Date": datepickar1.text,
-      "Ref_Time": "${selectedTime1.hour}:${selectedTime1.minute}",
+      "Prefix_Name": "online",
+      "Ref_No": int.tryParse(refController.text),
+      "Ref_Date": refDatePicker.text,
+      "Ref_Time": "${selectedTimeRefence.hour}:${selectedTimeRefence.minute}",
       "Title_id": selectedtitleId,
-      "Gender_Name": selectedtitleName,
-      "Customer_Name": nameController.text.toString(),
-      "Contact_Name": "raj1",
-      "SanOff_Name": soController.text.toString(),
-      "Address_Details": addresscontroller.text.toString(),
-      "City_Id": "2",
-      "City": "jaipur",
-      "Pin_Code": pinController.text.toString(),
-      "Mob_No": mobileControleer.text.toString(),
-      "Phon_No": "phon",
-      "Std_Code": stdController.text.toString(),
-      "Fax_No": "fax",
-      "Email_Id": emailcontroller.text.toString(),
-      "Birthday_Date": datepickar2.text,
-      "Anniversary_Date": datepickar3.text,
+      "Gender_Name": "Not Set Yet",
+      "Customer_Name": _customernameController.text.toString(),
+      "Contact_Name": "Not Set Yet",
+      "SanOff_Name": _sonoffController.text.toString(),
+      "Address_Datails": _addressController.text.toString(),
+      "City_Id": "1",
+      "City": cityValue,
+      "Pin_Code": _pinController.text.toString(),
+      "Mob_No": _mobileController.text.toString(),
+      "Phon_No":"Not Set Yet",
+      "Std_Code": "Not Set Yet",
+      "Fax_No": "Not Set Yet",
+      "Email_Id": _emailController.text.toString(),
+      "Birthday_Date": dobDatePicker.text,
+      "Anniversary_Date": dobDatePicker.text,
       "Enq_Type": selectedEnqtypeId,
-      "Mode_Type": "modeltype",
+      "Mode_Type": "Not Set Yet",
       "Occupation": selectedOccuptionId,
-      "Income": incomeController.text.toString(),
+      "Income": _incomeController.text.toString(),
       "EnqGenBy_Id": staffList
           .firstWhere((staff) => staff.staffName == selectedStaffId,
               orElse: () => Staffmodel(id: 0, staffName: ''))
@@ -1188,24 +1190,24 @@ final TextEditingController testController = TextEditingController();
               orElse: () => Staffmodel(id: 0, staffName: ''))
           .id,
       "Source_Id": selecteddropId,
-      "NoOfVisitor": "NoOfVisitor",
-      "Scheme": schemeController.text.toString(),
+      "NoOfVisitor": "Not Set Yet",
+      "Scheme": _schemeController.text.toString(),
       "Priority": selectedPrionaityId,
-      "InterestIn": "InterestIn",
+      "InterestIn": "Not Set Yet",
       "Model_Id": selectedproductId,
       "Colour_Id": selectedcolorsId,
-      "Remark_interest": "Remark_interest",
+      "Remark_interest": _intrestedremarksController.text.toString(),
       "ModelTest_Id": testId,
-      "ModelTest_Date": datepickar4.text.toString(),
-      "Remark_ModelTest": remarksController.text.toString(),
-      "Appointment_Date": datepickar5.text,
-      "Appointment_Time": "${selectedTime1.hour}:${selectedTime1.minute}",
-      "Remark_Appointment": remarksController2.text.toString(),
-      "Remark_Special": splRemarks.text.toString(),
-      "CurrentAppointmentDate": datepickar5.text,
+      "ModelTest_Date": rideDatePickar.text.toString(),
+      "Remark_ModelTest": _testRemarkController.text.toString(),
+      "Appointment_Date": appointmentDatePickar.text,
+      "Appointment_Time": "${selectedTimeRefence.hour}:${selectedTimeRefence.minute}",
+      "Remark_Appointment": _lastRemarkController.text.toString(),
+      "Remark_Special": _specialRemarkController.text.toString(),
+      "CurrentAppointmentDate": appointmentDatePickar.text,
       "EnquiryStatus": 1,
-      "Last_Remark": "jaipur",
-      "LastContact_Date": datepickar5.text,
+      "Last_Remark": _lastRemarkController.text.toString(),
+      "LastContact_Date": appointmentDatePickar.text,
     };
     // log(message)
     String jsonString = jsonEncode(postData);
@@ -1220,7 +1222,7 @@ final TextEditingController testController = TextEditingController();
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Api successfully ${response.statusCode}"),
+          content: Text(" ${ data}"),
           backgroundColor: Colors.green,
         ));
       } else {
@@ -1248,13 +1250,13 @@ final TextEditingController testController = TextEditingController();
       if (data is int) {
         setState(() {
           refController.text = data.toString();
-          detailsList1.add(data.toString());
+          datailsList1.add(data.toString());
         });
       } else if (data is Map<String, dynamic>) {
         setState(() {
           String refNo = data['Ref_No'].toString();
           refController.text = refNo;
-          detailsList1.add(refNo);
+          datailsList1.add(refNo);
         });
       } else {
         throw Exception('Unexpected response type');

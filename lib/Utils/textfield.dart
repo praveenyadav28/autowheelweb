@@ -178,11 +178,15 @@ InkWell addDefaultButton(Function()? onTap) {
   );
 }
 
-DropdownButton<Object> localDropdownButton(BuildContext context, Object? value,
+DropdownButton<Object> localDropdownButton(String hintText,BuildContext context, Object? value,
     List<DropdownMenuItem<Object>>? items, void Function(Object?)? onChanged) {
   return DropdownButton(
     underline: Container(),
     value: value,
+     hint: Text(
+        hintText,
+        style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),
+      ),
     dropdownColor: AppColor.colWhite,
     icon: Icon(
       Icons.keyboard_arrow_down_outlined,

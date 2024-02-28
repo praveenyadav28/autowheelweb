@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:autowheelweb/Components/menuController.dart';
+import 'package:autowheelweb/Utils/api.dart';
 import 'package:autowheelweb/Utils/colors.dart';
 import 'package:autowheelweb/Utils/mediaquery.dart';
 import 'package:autowheelweb/Utils/responsive.dart';
@@ -81,7 +82,7 @@ class _ReportScreenState extends State<ReportScreen> {
             children: [
               dropdownTextfield(
                 'Location',
-                localDropdownButton(
+                localDropdownButton("Location",
                   context,
                   selectedId3,
                   Loctionshow.map((item) {
@@ -187,7 +188,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     );
                   }
                 },
-                child: Button("Get Dta", AppColor.colPrimary),
+                child: Button("Get Data", AppColor.colPrimary),
               ),
               SizedBox(height: Sizes.height * 0.02),
               Wrap(
@@ -221,8 +222,8 @@ class _ReportScreenState extends State<ReportScreen> {
                         ' ${dateList[index]?["last_Remark"] ?? 'N/A'}'),
                     datastyle("Special Remark :",
                         ' ${dateList[index]?["remark_Special"] ?? 'N/A'}'),
-                    datastyle("Action Taken :",
-                        ' ${dateList[index]?["last_ActionTaken"] ?? 'N/A'}'),
+                    // datastyle("Action Taken :",
+                    //     ' ${dateList[index]?["last_ActionTaken"] ?? 'N/A'}'),
                     datastyle("Last Contact Date :",
                         ' ${dateList[index]?["lastContact_Date"] ?? 'N/A'}'),
                     datastyle("Priority :",
@@ -263,10 +264,11 @@ class _ReportScreenState extends State<ReportScreen> {
     );
   }
 
-  Future<void> allReportData(
-      {required String dateFrom,
-      required String dateTo,
-      required int locationId}) async {
+ Future<void> allReportData({
+    required String dateFrom,
+    required String dateTo,
+    required int locationId,
+  }) async {
     try {
       final formattedDateFrom = DateFormat('yyyy-MM-dd').format(
         DateFormat('yyyy-MM-dd').parse(dateFrom),
@@ -274,51 +276,46 @@ class _ReportScreenState extends State<ReportScreen> {
       final formattedDateTo = DateFormat('yyyy-MM-dd').format(
         DateFormat('yyyy-MM-dd').parse(dateTo),
       );
-      final response = await http.get(Uri.parse(
-        'http://lms.muepetro.com/api/UserController1/GetScheduleReport?datefrom=$formattedDateFrom&dateto=$formattedDateTo&locationid=$locationId',
-      ));
-      if (response.statusCode == 200) {
-        setState(() {
-          dateList = json.decode(response.body);
-        });
-        dateList.isEmpty
-            ? ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content:
-                      Text('No reports found between $dateFrom to $dateTo'),
-                ),
-              )
-            : print("Data fateched sccussfully");
-      } else {
+
+      final response = await ApiService.fetchData(
+        'GetScheduleReport?datefrom=$formattedDateFrom&dateto=$formattedDateTo&locationid=$locationId',
+      );
+
+      // Assuming dateList is a property of the class
+      setState(() {
+        dateList = response;
+      });
+
+      if (dateList.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to load data. Please try again.'),
+          SnackBar(
+            content:
+                Text('No reports found between $dateFrom to $dateTo'),
           ),
         );
+      } else {
+        print("Data fetched successfully");
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(' $error'),
+          content: Text('$error'),
         ),
       );
     }
   }
 
-  Future<void> getLocation() async {
+Future<void> getLocation() async {
     try {
-      final response = await http.get(
-          Uri.parse('http://lms.muepetro.com/api/UserController1/GetLocation'));
-      if (response.statusCode == 200) {
-        List<dynamic> data = jsonDecode(response.body);
-        setState(() {
-          Loctionshow.add({'id': 0, 'location_Name': 'Select a Location'});
-          Loctionshow.addAll(data.cast<Map<String, dynamic>>());
-        });
-      } else {
-        print('Request failed with status: ${response.statusCode}');
-        print('Response Data: ${response.body}');
-      }
+      final response = await ApiService.fetchData('GetLocation');
+
+      List<dynamic> data = response;
+      
+      // Assuming Loctionshow and setState are accessible
+      setState(() {
+        Loctionshow.add({'id': 0, 'location_Name': 'Select a Location'});
+        Loctionshow.addAll(data.cast<Map<String, dynamic>>());
+      });
     } catch (e) {
       print('Error: $e');
     }

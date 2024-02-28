@@ -113,8 +113,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             SizedBox(height: Sizes.height * .1),
             Responsive(
               mobile: Registration(registrationList: registrationList, crossAxisCount: 1),
-              desktop: Registration(registrationList: registrationList, childAspectRatio: Sizes.width < 1400 ? 2 : 2.5),
-              tablet: Registration(registrationList: registrationList, crossAxisCount: Sizes.width < 1400 ? 1 : 3),
+              desktop: Registration(registrationList: registrationList, childAspectRatio: Sizes.width < 1400 ? 2 : 2.5,crossAxisCount: 3),
+              tablet: Registration(registrationList: registrationList, crossAxisCount:2,childAspectRatio: Sizes.width < 1400 ? 2 : 2.5),
             ),
             SizedBox(height: Sizes.height * 0.05),
           ],

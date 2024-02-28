@@ -1,12 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String baseUrl = "http://lms.muepetro.com/api/UserController1";
 
-  
   static Future<List<dynamic>> fetchData(String endpoint) async {
     final response = await http.get(Uri.parse('$baseUrl/$endpoint'));
 
@@ -17,11 +14,15 @@ class ApiService {
     }
   }
 
-  static Future postData(String endpoint, Map data) async {
+  static Future postData(String endpoint, Map<String, dynamic> data) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/$endpoint'),
-        body: data,
+        headers: {
+          'Content-Type': 'application/json', // Specify content-type
+          'Access-Control-Allow-Origin': '*', // Allow requests from any origin
+        },
+        body: jsonEncode(data),
       );
 
       if (response.statusCode == 200) {
@@ -33,14 +34,8 @@ class ApiService {
       } else {
         throw Exception('Failed to post data: ${response.statusCode}');
       }
-    } on SocketException catch (e) {
-      throw Exception('Failed to connect: $e');
-    } on HttpException catch (e) {
-      throw Exception('Failed to connect: $e');
     } catch (e) {
       throw Exception('Failed to post data: $e');
     }
   }
 }
-
-
