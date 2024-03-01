@@ -1030,7 +1030,7 @@ final TextEditingController testController = TextEditingController();
               InkWell(
                   onTap: () {
                     postProspect();
-                    // getLocation();
+                    getLocation();
                   },
                   child: Button("Save", AppColor.colPrimary)),
               SizedBox(height: Sizes.height * 0.02),
@@ -1048,7 +1048,7 @@ final TextEditingController testController = TextEditingController();
       final data = await ApiService.fetchData('GetLocation');
       if (data != null && data is List<dynamic>) {
         setState(() {
-          locationList.add({'id': 0, 'location_Name': 'Select a Location'});
+          // locationList.add({'id': 0, 'location_Name': 'Select a Location'});
           locationList.addAll(data.cast<Map<String, dynamic>>());
         });
       } else {

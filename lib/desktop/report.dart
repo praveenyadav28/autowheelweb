@@ -34,10 +34,10 @@ class _ReportScreenState extends State<ReportScreen> {
   List<dynamic> dateList = [];
 
   TextEditingController datepickar1 = TextEditingController(
-    text: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+    text: DateFormat('M/d/yyyy').format(DateTime.now()),
   );
   TextEditingController datepickar2 = TextEditingController(
-    text: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+    text: DateFormat('M/d/yyyy').format(DateTime.now()),
   );
   int selectedId3 = 0;
   int? loctionid; // Change type to int?
@@ -119,7 +119,7 @@ class _ReportScreenState extends State<ReportScreen> {
                           ).then((selectedDate) {
                             if (selectedDate != null) {
                               datepickar1.text =
-                                  DateFormat('dd-MM-yyyy').format(selectedDate);
+                                  DateFormat('M/d/yyyy').format(selectedDate);
                             }
                           });
                         },
@@ -148,11 +148,11 @@ class _ReportScreenState extends State<ReportScreen> {
                             context: context,
                             initialDate: DateTime.now(),
                             firstDate: DateTime(1900),
-                            lastDate: DateTime.now(),
+                            lastDate: DateTime(2050),
                           ).then((selectedDate) {
                             if (selectedDate != null) {
                               datepickar2.text =
-                                  DateFormat('dd-MM-yyyy').format(selectedDate);
+                                  DateFormat('M/d/yyyy').format(selectedDate);
                             }
                           });
                         },
@@ -270,11 +270,11 @@ class _ReportScreenState extends State<ReportScreen> {
     required int locationId,
   }) async {
     try {
-      final formattedDateFrom = DateFormat('yyyy-MM-dd').format(
-        DateFormat('yyyy-MM-dd').parse(dateFrom),
+      final formattedDateFrom = DateFormat('M/d/yyyy').format(
+        DateFormat('M/d/yyyy').parse(dateFrom),
       );
-      final formattedDateTo = DateFormat('yyyy-MM-dd').format(
-        DateFormat('yyyy-MM-dd').parse(dateTo),
+      final formattedDateTo = DateFormat('M/d/yyyy').format(
+        DateFormat('M/d/yyyy').parse(dateTo),
       );
 
       final response = await ApiService.fetchData(
@@ -308,9 +308,7 @@ class _ReportScreenState extends State<ReportScreen> {
 Future<void> getLocation() async {
     try {
       final response = await ApiService.fetchData('GetLocation');
-
       List<dynamic> data = response;
-      
       // Assuming Loctionshow and setState are accessible
       setState(() {
         Loctionshow.add({'id': 0, 'location_Name': 'Select a Location'});
