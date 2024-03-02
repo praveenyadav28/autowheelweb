@@ -1,8 +1,8 @@
 // ignore_for_file: file_names
 
-import 'package:autowheelweb/desktop/dashboardScreen.dart';
 import 'package:flutter/material.dart';
 
+import '../desktop/dashboardScreen.dart';
 
 class MenuControlle extends ChangeNotifier {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -14,7 +14,7 @@ class MenuControlle extends ChangeNotifier {
   }
 }
 
-dynamic klass =  DashboardScreen();
+dynamic klass = const DashboardScreen();
 
 class Classvaluechange extends ChangeNotifier {
   onChanged(Object? cangedclass, BuildContext context) {

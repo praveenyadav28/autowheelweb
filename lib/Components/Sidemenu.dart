@@ -30,6 +30,12 @@ class _SideMenuState extends State<SideMenu> {
               DrawerHeader(child: Image.asset("assets/autowheellogo2.png",)),
               DrawerListtile(
                 onTap: () {
+                  // value.onChanged( DashboardScreen(),context);
+                },
+                Title: "My Account",
+              ),
+              DrawerListtile(
+                onTap: () {
                   value.onChanged( DashboardScreen(),context);
                 },
                 Title: "Dashboard",
@@ -58,13 +64,7 @@ class _SideMenuState extends State<SideMenu> {
                 },
                 Title: "Closed Sale",
               ),
-              DrawerListtile(
-                onTap: () {
-                  // value.onChanged(const Approve());
-                },
-                Title: "Privacy Policy",
-              ),
-              DrawerListtile(
+             DrawerListtile(
                 onTap: () {
                   // value.onChanged(const AdminUsers());
                 },

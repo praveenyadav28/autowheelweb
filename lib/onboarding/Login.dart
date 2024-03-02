@@ -1,6 +1,8 @@
 // ignore_for_file: non_constant_identifier_names, file_names, use_full_hex_values_for_flutter_colors, prefer_const_constructors
 
 import 'package:autowheelweb/Utils/mediaquery.dart';
+import 'package:autowheelweb/Utils/textfield.dart';
+import 'package:autowheelweb/desktop/dashboardScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -75,11 +77,12 @@ class _LoginScreenState extends State<LoginScreen> {
           validator: (value) {
             if (value!.isEmpty) {
               return "Please enter license";
-            } else if (licenseController.text != "ABC1234") {
+            } else if (licenseController.text != "123456") {
               return "Please enter valid license id";
             }
             return null;
           },
+          keyboardType: TextInputType.number,
           decoration:  InputDecoration(
             contentPadding:
                 EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -108,12 +111,11 @@ class _LoginScreenState extends State<LoginScreen> {
           validator: (value) {
             if (value!.isEmpty) {
               return "Please enter password";
-            } else if (passwordController.text != "123456") {
+            } else if (passwordController.text != "abc123") {
               return "Please enter correct password";
             }
             return null;
           },
-          keyboardType: TextInputType.number,
           style:  TextStyle(color: AppColor.colBlack, fontSize: 20),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.all(10),
@@ -146,25 +148,23 @@ class _LoginScreenState extends State<LoginScreen> {
         InkWell(
           onTap: () {
             if (_formKey.currentState!.validate()) {
-              Navigator.pushReplacement(
+             Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>  const FullScreen(),
-                    
+                    builder: (context) => MultiProvider(
+                      providers: [
+                        ChangeNotifierProvider<Classvaluechange>(
+                            create: (_) => Classvaluechange()),
+                        ChangeNotifierProvider(
+                            create: (context) => MenuControlle())
+                      ],
+                      child: const FullScreen(),
+                    ),
                   ));
             }
           },
-          child: Container(
-            height: 50,
-            decoration:  BoxDecoration(
-                color: AppColor.colPrimary,
-                borderRadius: BorderRadius.all(Radius.circular(8))),
-            child:  Center(
-              child: Text(
-                "Login",
-                style: TextStyle(color: AppColor.colWhite, fontSize: 20),
-              ),
-            ),
+          child: Button(
+              'Login',AppColor.colPrimary
           ),
         )
       ],

@@ -1,11 +1,16 @@
 // ignore_for_file: file_names, non_constant_identifier_names, camel_case_types, prefer_const_constructors, unused_import, prefer_const_constructors_in_immutables
 
+import 'dart:convert';
+
+import 'package:autowheelweb/desktop/addqueries.dart';
+import 'package:autowheelweb/desktop/searchProspect.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Components/Sidemenu.dart';
 import '../Components/menuController.dart';
 import '../Utils/mediaquery.dart';
 import '../Utils/textstyle.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import '../Utils/Colors.dart';
 import '../Utils/responsive.dart';
 
@@ -20,34 +25,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Map<String, dynamic>> dataList = [
     {
       "icon": Icon(Icons.person),
-      "color": Colors.red.withOpacity(0.1),
-      "title": "Active",
+      "color": Colors.red.withOpacity(0.6),
+      "title": "Enquery Punched Today",
       "users": "1263"
     },
     {
       "icon": Icon(Icons.person),
-      "color": Colors.blue.withOpacity(0.1),
-      "title": "Online",
+      "color": Colors.blue.withOpacity(0.6),
+      "title": "Tommarow Follow-ups",
       "users": "704"
     },
     {
       "icon": Icon(Icons.verified_user),
-      "color": Colors.green.withOpacity(0.1),
-      "title": "Verified",
+      "color": Colors.green.withOpacity(0.6),
+      "title": "Today Follow-ups",
       "users": "800"
     },
     {
       "icon": Icon(Icons.info),
-      "color": Colors.yellow.withOpacity(0.1),
-      "title": "Reported",
+      "color": Colors.yellow.withOpacity(0.6),
+      "title": "Total Leads",
       "users": "100"
     },
-    {
-      "icon": Icon(Icons.no_accounts),
-      "color": Colors.orange.withOpacity(0.1),
-      "title": "Blocked",
-      "users": "80"
-    },
+    // {
+    //   "icon": Icon(Icons.no_accounts),
+    //   "color": Colors.orange.withOpacity(0.6),
+    //   "title": "Blocked",
+    //   "users": "80"
+    // },
   ];
   final List<Map<String, dynamic>> registrationList = [
     {
@@ -100,23 +105,90 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       backgroundColor: AppColor.colPrimary.withOpacity(.2),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: Sizes.height * 0.03),
+        padding: EdgeInsets.symmetric(horizontal: Sizes.width * 0.05),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(height: Sizes.height * 0.05),
             Responsive(
               mobile: FileInfoCard(dataList: dataList, crossAxisCount: 2),
-              desktop: FileInfoCard(dataList: dataList, childAspectRatio: Sizes.width < 1400 ? 1.1 : 1.4),
-              tablet: FileInfoCard(dataList: dataList, crossAxisCount: Sizes.width < 1100 ? 3 : 5),
+              desktop: FileInfoCard(dataList: dataList, childAspectRatio: Sizes.width < 1400 ? 1.1 : 1.4,crossAxisCount: 4,),
+              tablet: FileInfoCard(dataList: dataList, crossAxisCount:  3 ),
             ),
-            SizedBox(height: Sizes.height * .1),
-            Responsive(
-              mobile: Registration(registrationList: registrationList, crossAxisCount: 1),
-              desktop: Registration(registrationList: registrationList, childAspectRatio: Sizes.width < 1400 ? 2 : 2.5,crossAxisCount: 3),
-              tablet: Registration(registrationList: registrationList, crossAxisCount:2,childAspectRatio: Sizes.width < 1400 ? 2 : 2.5),
-            ),
-            SizedBox(height: Sizes.height * 0.05),
+            SizedBox(height: Sizes.height*0.03,),
+            Text("    Search Prospect",style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack,)),
+            SizedBox(height: Sizes.height*0.01,),
+            InkWell(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SearchProspect(),));
+              },
+              child: Container(
+                height: 50,
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 5,horizontal: 7),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(30),color: AppColor.colWhite,border: Border.all(color: AppColor.colBlack,width: 2)),
+                child: Row(
+                  children: [
+                    Icon(Icons.search_sharp,size: 30,color: AppColor.colGrey,),
+                     Text("  Customer Name",style: rubikTextStyle(15, FontWeight.w500, AppColor.colBlack,)),
+                     Spacer(),
+                     Container( padding: EdgeInsets.symmetric(horizontal: 10),
+                     height: double.infinity,
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(30),color: AppColor.colPrimary.withOpacity(.3)),
+               
+                      child: Row(
+                      children: [ Icon(Icons.search_sharp,size: 24,color: AppColor.colGrey,),
+              
+                     Text("   Mobile No.",style: rubikTextStyle(15, FontWeight.w500, AppColor.colBlack,)),],
+                      ),
+                     )
+                         
+                  ],),
+              ),
+            ), 
+
+            SizedBox(height: Sizes.height*0.02,),
+            Card(
+            // width: double.infinity,
+            // decoration: BoxDecoration(color: AppColor.colWhite,borderRadius: BorderRadius.circular(5)),
+                        child: Padding(
+                           padding: EdgeInsets.symmetric(vertical: Sizes.height*0.01,horizontal: Sizes.width*0.04),
+                          child: Column(
+                            children: [ 
+                               Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text("Enquery Type",style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack,))),                  SfCircularChart(
+                             series: <CircularSeries>[
+                               DoughnutSeries<ChartData, String>(
+                                 dataSource: <ChartData>[
+                                   ChartData('Online', 10, color: AppColor.colPriLite),
+                                   ChartData('Camping', 30, color: AppColor.colPrimary),
+                                   ChartData('Call', 40, color: AppColor.colYellow),
+                                   ChartData('Visit', 20, color: AppColor.colRideFare),
+                                 ],
+                                 pointColorMapper: (ChartData data, _) => data.color,
+                                 xValueMapper: (ChartData data, _) => data.x,
+                                 yValueMapper: (ChartData data, _) => data.y,
+                                 dataLabelSettings: DataLabelSettings(
+                                   isVisible: true,
+                                   labelPosition: ChartDataLabelPosition.outside,
+                                 ),
+                                 dataLabelMapper: (ChartData data, _) => '${data.x}: ${data.y.toStringAsFixed(0)}%', // Customize label text
+                               ),
+                             ],
+                           )
+                           ],
+                          ),
+                        ),
+          ),
+       
+            // Responsive(
+            //   mobile: Registration(registrationList: registrationList, crossAxisCount: 1),
+            //   desktop: Registration(registrationList: registrationList, childAspectRatio: Sizes.width < 1400 ? 2 : 2.5,crossAxisCount: 3),
+            //   tablet: Registration(registrationList: registrationList, crossAxisCount:2,childAspectRatio: Sizes.width < 1400 ? 2 : 2.5),
+            // ),
+            // SizedBox(height: Sizes.height * 0.05),
           ],
         ),
       ),
@@ -185,29 +257,42 @@ class FileInfoCard extends StatelessWidget {
         crossAxisSpacing: Sizes.width * 0.015,
         crossAxisCount: crossAxisCount,
       ),
-      itemBuilder: (context, index) => Card(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              padding: EdgeInsets.all(Sizes.width * 0.01),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: dataList[index]["color"],
+      itemBuilder: (context, index) => InkWell(
+        
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AddQueries(index: index,)));
+              },
+        child: Card(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Align(alignment: Alignment.topLeft,
+                child: Container(
+                  margin: EdgeInsets.only(left: 10),
+                  padding: EdgeInsets.all(Sizes.width * 0.01),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: dataList[index]["color"],
+                  ),
+                  child: dataList[index]["icon"],
+                ),
               ),
-              child: dataList[index]["icon"],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(dataList[index]["title"], overflow: TextOverflow.ellipsis),
-                Text(dataList[index]["users"], overflow: TextOverflow.ellipsis),
-              ],
-            ),
-          ],
+                  Text(dataList[index]["users"], overflow: TextOverflow.ellipsis,style: rubikTextStyle(25, FontWeight.w500, AppColor.colBlack),),
+             Text(dataList[index]["title"], overflow: TextOverflow.ellipsis,style: rubikTextStyle(13, FontWeight.w500, AppColor.colBlack),),
+                 
+            ],
+          ),
         ),
       ),
     );
   }
+}
+
+class ChartData {
+  final String x;
+  final double y;
+  final Color color;
+
+  ChartData(this.x, this.y, {this.color = Colors.blue});
 }
