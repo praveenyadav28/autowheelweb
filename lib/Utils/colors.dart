@@ -17,6 +17,7 @@ class AppColor {
   static Color colFbCircle = Color(0xff1B74E4);
   static Color colStarUnrt = Color(0XFF575757);
   static Color colRideFare = Color(0XFFC80203);
+  static Color colpurple = Color.fromARGB(255, 233, 64, 177);
   static Color colAlertText = Colors.black54;
   static Color colBtmSheet = Color(0XFF1C1C1C);
   static Color colDivider = Color(0XFF303030);

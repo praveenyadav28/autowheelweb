@@ -55,6 +55,7 @@ dependencies:
   open_file: ^3.3.2
   location: ^5.0.0-dev.8
   syncfusion_flutter_charts: ^24.2.8
+  url_launcher: ^6.2.5
 
 dev_dependencies:
   flutter_test:

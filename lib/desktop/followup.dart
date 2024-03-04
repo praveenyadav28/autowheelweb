@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:autowheelweb/Components/menuController.dart';
 import 'package:autowheelweb/Utils/colors.dart';
@@ -11,7 +12,6 @@ import 'package:autowheelweb/Utils/textfield.dart';
 import 'package:autowheelweb/Utils/textstyle.dart';
 import 'package:autowheelweb/model/group.dart';
 import 'package:autowheelweb/model/prospect_modal.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -43,15 +43,15 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
   final TextEditingController customerController = TextEditingController();
   // int? selectedPrionaityId;
   int? selectedVisitorId;
-  //
-  List<Map<String, dynamic>> Prionaity = [  ];
-  Map<String, dynamic>? selectedValue;
-  // int proirityId = 0;
-  final TextEditingController textEditingController = TextEditingController();
-  int? selectedPrionaityId;
+  
+
+//Priority
+  List<Map<String, dynamic>> priorityList = [ {'id': 0, 'name': 'Cold'},{'id': 1, 'name': 'Normal'},{'id': 2, 'name': 'Hot'}];
+  int selectedPriorityId = 0;
+  String  selectedPriorityName  = 'Cold';
   //
   List<Map<String, dynamic>> Folowtype = [ ];
-  String? selectedFolowtypeName;
+  // String? selectedFolowtypeName;
   // int? selectedFolowtypeId;
   Map<String, dynamic>? selectedfollowupValue;
   int? followupid;
@@ -104,7 +104,6 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
   }
 
   refreshData() async {
-    await prionaityDeta();
     followtypeDeta();
     customer();
     PrefixData();
@@ -115,23 +114,11 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
     super.initState();
     setState(() {
       _selectedTime = TimeOfDay.now();
-      prionaityDeta();
       startTimer();
-      followtypeDeta();
-      customer();
       refreshData();
     });
     RefController.text = widget.refnom == null ? "" : widget.refnom.toString();
-    // Prionaity.clear();
-    // Prionaity.add({'id': 0, 'name': 'Prionaity'});
-    // prionaityDeta().then((_) {
-    //   setState(() {
-    //     selectedValue = Prionaity.firstWhere(
-    //       (item) => item['id'] == selectedPrionaityId,
-    //       orElse: () => Prionaity[0],
-    //     );
-      // });
-    // });
+    
   }
 
   @override
@@ -239,58 +226,26 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
                   SizedBox(height: Sizes.height * 0.02),
                   textformfiles(RemarksController, labelText: "Remarks"),
                   SizedBox(height: Sizes.height * 0.02),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: dropdownTextfield(
-                          "Select Priority",searchDropDown('Select Priority', Prionaity.map((item) => DropdownMenuItem(
-                                    onTap: () {
-                                      selectedPrionaityId = item['id'];
-                                    },
-                                    value: item,
-                                    child: Text(
-                                      item['name'].toString(),
-                                      style: rubikTextStyle(
-                                          16,
-                                          FontWeight.w500,
-                                          AppColor.colBlack),
-                                    ),
-                                  )).toList(), selectedValue, (value) {
-                                setState(() {
-                                  selectedValue = value;
-                                });
-                              }, textEditingController,  (value) {
-                                      setState(() {
-                                        // Filter the Prionaity list based on the search value
-                                        Prionaity.where((item) => item['name']
-                                                .toString()
-                                                .toLowerCase()
-                                                .contains(
-                                                    value.toLowerCase()))
-                                            .toList();
-                                      });
-                                    }, 'Search for a priority...',  (isOpen) {
-                                if (!isOpen) {
-                                  textEditingController.clear();
-                                }
-                              })
-                        ),
-                      ),
-                      SizedBox(width: Sizes.width * 0.02),
-                      addDefaultButton(
-                        () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AddGroupScreen(
-                                        sourecID: 22,
-                                        name: "Priority",
-                                      ))).then((value) => refreshData());
-                        },
-                      )
-                    ],
-                  ),
-                  SizedBox(height: Sizes.height * 0.02),
+                  dropdownTextfield(
+                  "Priority",
+                  DropdownButton<int>(
+      value: selectedPriorityId,
+      onChanged: (newValue) {
+        setState(() {
+          selectedPriorityId = newValue!;
+        });
+        // Call your API with the selected ID
+        print('Selected ID: $selectedPriorityId');
+      },
+      items: priorityList.map<DropdownMenuItem<int>>((Map<String, dynamic> item) {
+        return DropdownMenuItem<int>(
+          value: item['id'],
+          child: Text(item['name']),
+        );
+      }).toList(),
+    )
+           ),
+              SizedBox(height: Sizes.height * 0.02),
                   Row(
                     children: [
                        Expanded(
@@ -420,28 +375,6 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
     );
   }
 
-  Future<void> prionaityDeta() async {
-    final url = Uri.parse(
-        'http://lms.muepetro.com/api/UserController1/GetMiscMaster?MiscTypeId=22');
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final List<Goruppartmodel> goruppartmodelList =
-            grouppartmodelFromJson(response.body);
-            Prionaity.clear();
-        for (var item in goruppartmodelList) {
-          Prionaity.add({'id': item.id, 'name': item.name});
-        }
-        setState(() {});
-      } else {
-        print('Request failed with status: ${response.statusCode}');
-        print('Response Data: ${response.body}');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
   Future<void> followtypeDeta() async {
     final url = Uri.parse(
         'http://lms.muepetro.com/api/UserController1/GetMiscMaster?MiscTypeId=18');
@@ -503,7 +436,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
       "Remarks": RemarksController.text.toString(),
       "Remark_Special": splController.text.toString(),
       "ActionTaken": "ActionTaken",
-      "Priority": selectedPrionaityId,
+      "Priority": selectedPriorityId,
       "EnquiryStatus": 1,
       "Reason": "Reason",
       "VehiclePurchase": "VehiclePurchase"
@@ -568,13 +501,13 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
             ContactnumbarController.text = data['mob_No'] ?? '';
             RemarksController.text = data['remarks'] ?? '';
             splController.text = data['remark_Special'] ?? '';
-            selectedPrionaityId = data['priority'];
+            selectedPriorityId = data['priority'];
             followupid = data['follow_Type'];
-            // selectedVisitorId = 76;
-            selectedValue = Prionaity.firstWhere(
-              (item) => item['id'] == selectedPrionaityId,
-              orElse: () => Prionaity[0],
-            );
+            selectedVisitorId = 76;
+            selectedPriorityName = priorityList.firstWhere(
+              (item) => item['id'] == selectedPriorityId,
+              orElse: () => priorityList[0],
+            ) as String;
             selectedfollowupValue = Folowtype.firstWhere(
               (item) => item['id'] == followupid,
               orElse: () => Folowtype[0],

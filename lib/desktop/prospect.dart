@@ -51,7 +51,6 @@ class _ProspectScreenState extends State<ProspectScreen> {
   TextEditingController dobDatePicker = TextEditingController(
     text: DateFormat('M/d/yyyy').format(DateTime.now()),
   );
-
   TextEditingController rideDatePickar = TextEditingController(
     text: DateFormat('M/d/yyyy').format(DateTime.now()),
   );
@@ -83,11 +82,12 @@ class _ProspectScreenState extends State<ProspectScreen> {
 
 final TextEditingController testController = TextEditingController();
 
+//Priority
+  List<Map<String, dynamic>> priorityList = [ {'id': 0, 'name': 'Cold'},{'id': 1, 'name': 'Normal'},{'id': 2, 'name': 'Hot'}];
+  // String selectedPriorityName = "Cold";
+  int selectedPriorityId = 0;
 
-  List<Map<String, dynamic>> Prionaity = [  ];
-  int? selectedPrionaityId;
-  String? selectedPrionaityName;
-  // final TextEditingController priorityController = TextEditingController();
+//Product
   List<Map<String, dynamic>> product = [  ];
   String? selectedproductName;
   int? selectedproductId;
@@ -95,6 +95,7 @@ final TextEditingController testController = TextEditingController();
   Map<String, dynamic>? selectedtestValue;
   int? testId;
 
+//Title
   List<Map<String, dynamic>> title = [ {'id': 0, 'name': 'Mr.'},{'id': 1, 'name': 'Mrs.'},{'id': 2, 'name': 'Dr.'},{'id': 3, 'name': 'M/S'}];
   String selectedtitleName = "Mr.";
   int selectedtitleId = 0;
@@ -157,7 +158,6 @@ final TextEditingController testController = TextEditingController();
     colorData();
     enqtypeData();
     occuptionData();
-    prionaityData();
     productData();
     testData();
     _fetchRefNo();
@@ -168,7 +168,6 @@ final TextEditingController testController = TextEditingController();
     colorData();
     enqtypeData();
     occuptionData();
-    prionaityData();
     productData();
     testData();
     _fetchRefNo();
@@ -669,56 +668,28 @@ final TextEditingController testController = TextEditingController();
                 ],
               ),
               SizedBox(height: Sizes.height * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                      child: dropdownTextfield(
-                          "Priority",
-                         localDropdownButton( "Select Priority",
-                                  context,
-                                  selectedPrionaityName,
-                                  Prionaity.map((item) {
-                                    return DropdownMenuItem(
-                                      value: item['name'],
-                                      
-                                      child: Text(
-                                        item['name'],
-                                        style: rubikTextStyle(16,
-                                            FontWeight.w500, AppColor.colBlack),
-                                      ),
-                                    );
-                                  }).toList(), (value) {
-                                setState(() {
-                                  selectedPrionaityName = value.toString();
-                                  selectedPrionaityId = Prionaity.firstWhere(
-                                              (item) => item['name'] == value)
-                                          .containsKey('id')
-                                      ? Prionaity.firstWhere(
-                                          (item) => item['name'] == value)['id']
-                                      : null;
-                                  log(selectedPrionaityId.toString());
-                                });
-                              })
-                          )),
-               
-                  SizedBox(width: Sizes.width * 0.04),
-                  addDefaultButton(
-                    () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddGroupScreen(
-                                    sourecID: 22,
-                                    name: 'Priority',
-                                  ))).then((value) => refreshData());
-                    },
-                  )
-                ],
-              ),
+              dropdownTextfield(
+                  "Priority",
+                     DropdownButton<int>(
+      value: selectedPriorityId,
+      onChanged: (newValue) {
+        setState(() {
+          selectedPriorityId = newValue!;
+        });
+        // Call your API with the selected ID
+        print('Selected ID: $selectedPriorityId');
+      },
+      items: priorityList.map<DropdownMenuItem<int>>((Map<String, dynamic> item) {
+        return DropdownMenuItem<int>(
+          value: item['id'],
+          child: Text(item['name']),
+        );
+      }).toList(),
+    )  ),
               SizedBox(height: Sizes.height * 0.02),
               textformfiles(_schemeController, labelText: "Scheme"),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_incomeController, labelText: "Income"),
+              textformfiles(_incomeController, labelText: "Income",keyboardType: TextInputType.number),
               SizedBox(height: Sizes.height * 0.05),
               Text(
                 "Intersted in following product",
@@ -1121,28 +1092,6 @@ final TextEditingController testController = TextEditingController();
   // Future<void> prionaityData() async {
   //   await fetchDataByMiscTypeId(22, Prionaity,);
   // }
-    Future<void> prionaityData() async {
-    final url = Uri.parse(
-        'http://lms.muepetro.com/api/UserController1/GetMiscMaster?MiscTypeId=22');
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final List<Goruppartmodel> goruppartmodelList =
-            grouppartmodelFromJson(response.body);
-            Prionaity.clear();
-        for (var item in goruppartmodelList) {
-          Prionaity.add({'id': item.id, 'name': item.name});
-        }
-        setState(() {});
-      } else {
-        print('Request failed with status: ${response.statusCode}');
-        print('Response Data: ${response.body}');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
-  }
-
 
   Future<void> productData() async {
     await fetchDataByMiscTypeId(19, product,);
@@ -1192,7 +1141,7 @@ final TextEditingController testController = TextEditingController();
       "Source_Id": selecteddropId,
       "NoOfVisitor": "Not Set Yet",
       "Scheme": _schemeController.text.toString(),
-      "Priority": selectedPrionaityId,
+      "Priority": selectedPriorityId,
       "InterestIn": "Not Set Yet",
       "Model_Id": selectedproductId,
       "Colour_Id": selectedcolorsId,

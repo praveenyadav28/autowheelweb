@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
 // }
 
 // class _MyHomePageState extends State<MyHomePage> {
-// late List data = [];
+// late List data = [] ;
 
 //   Future<String> getData() async {
 //    http.Response? response = await http.get(Uri.parse("http://lms.muepetro.com/api/UserController1/GetLocation"));
@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
 //         // headers: {"Accept": "application/json"}
         
 //     setState(() {
-//       data = json.decode(response.body);
+//       data = json.decode( response.body);
 //     });
 //     return "Success";
 //   }
@@ -83,7 +83,7 @@ class MyApp extends StatelessWidget {
 //         title: Text("Flutter Api Example"),
 //       ),
 //       body: Center(
-//         child: getList(),
+//         child: getList()
 //       ),
 //     );
 //   }

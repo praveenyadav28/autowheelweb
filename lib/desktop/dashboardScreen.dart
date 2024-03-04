@@ -27,25 +27,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
       "icon": Icon(Icons.person),
       "color": Colors.red.withOpacity(0.6),
       "title": "Enquery Punched Today",
-      "users": "1263"
+      "users": "2"
     },
     {
       "icon": Icon(Icons.person),
       "color": Colors.blue.withOpacity(0.6),
       "title": "Tommarow Follow-ups",
-      "users": "704"
+      "users": "2"
     },
     {
       "icon": Icon(Icons.verified_user),
       "color": Colors.green.withOpacity(0.6),
       "title": "Today Follow-ups",
-      "users": "800"
+      "users": "3"
     },
     {
       "icon": Icon(Icons.info),
       "color": Colors.yellow.withOpacity(0.6),
       "title": "Total Leads",
-      "users": "100"
+      "users": "50"
     },
     // {
     //   "icon": Icon(Icons.no_accounts),
@@ -149,6 +149,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ), 
 
             SizedBox(height: Sizes.height*0.02,),
+             Card(
+            // width: double.infinity,
+            // decoration: BoxDecoration(color: AppColor.colWhite,borderRadius: BorderRadius.circular(5)),
+                        child: Padding(
+                           padding: EdgeInsets.symmetric(vertical: Sizes.height*0.01,horizontal: Sizes.width*0.04),
+                          child: Column(
+                            children: [
+                              ListTile(title: Text("Sales Colsed"),trailing: Container(height: 20,width: 20,decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
+          color: AppColor.colFbCircle,),),),
+                              ListTile(title: Text("In process"),trailing: Container(height: 20,width: 20,decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
+          color: AppColor.colTeal,),),),
+                              ListTile(title: Text("Not Interested"),trailing: Container(height: 20,width: 20,decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
+          color: AppColor.colRideFare,),),),
+                              StackedColumnChart(),
+                            ],
+                          ))),
+          SizedBox(height: Sizes.height*0.02,),
             Card(
             // width: double.infinity,
             // decoration: BoxDecoration(color: AppColor.colWhite,borderRadius: BorderRadius.circular(5)),
@@ -156,9 +173,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                            padding: EdgeInsets.symmetric(vertical: Sizes.height*0.01,horizontal: Sizes.width*0.04),
                           child: Column(
                             children: [ 
-                               Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text("Enquery Type",style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack,))),                  SfCircularChart(
+                               ListTile(
+                               
+                                title: Text("Enquery Type",style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack,)),
+                                trailing: IconButton(
+                  onPressed: (){
+
+                  },
+                   icon: Column(
+                     children: [
+                       Icon(Icons.filter_alt_outlined,color: AppColor.colPrimary,size: 20,),
+                       Text("Filter",style: rubikTextStyle(10, FontWeight.w500, AppColor.colPrimary),)
+                     ],
+                   ),
+                 ),
+                                ),       
+                         SfCircularChart(
                              series: <CircularSeries>[
                                DoughnutSeries<ChartData, String>(
                                  dataSource: <ChartData>[
@@ -177,13 +207,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                  dataLabelMapper: (ChartData data, _) => '${data.x}: ${data.y.toStringAsFixed(0)}%', // Customize label text
                                ),
                              ],
-                           )
+                           ),
                            ],
                           ),
                         ),
           ),
-       
-            // Responsive(
+           // Responsive(
             //   mobile: Registration(registrationList: registrationList, crossAxisCount: 1),
             //   desktop: Registration(registrationList: registrationList, childAspectRatio: Sizes.width < 1400 ? 2 : 2.5,crossAxisCount: 3),
             //   tablet: Registration(registrationList: registrationList, crossAxisCount:2,childAspectRatio: Sizes.width < 1400 ? 2 : 2.5),
@@ -258,24 +287,39 @@ class FileInfoCard extends StatelessWidget {
         crossAxisCount: crossAxisCount,
       ),
       itemBuilder: (context, index) => InkWell(
-        
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context) => AddQueries(index: index,)));
               },
         child: Card(
+        
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Align(alignment: Alignment.topLeft,
-                child: Container(
-                  margin: EdgeInsets.only(left: 10),
-                  padding: EdgeInsets.all(Sizes.width * 0.01),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: dataList[index]["color"],
-                  ),
-                  child: dataList[index]["icon"],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: dataList[index]["color"],
+                      ),
+                      child: dataList[index]["icon"],
+                    ),
+                 if (index==3) IconButton(
+                  onPressed: (){
+
+                  },
+                   icon: Column(
+                     children: [
+                       Icon(Icons.filter_alt_outlined,color: AppColor.colPrimary,size: 20,),
+                       Text("Filter",style: rubikTextStyle(10, FontWeight.w500, AppColor.colPrimary),)
+                     ],
+                   ),
+                 ) else Container(),
+                  ],
                 ),
               ),
                   Text(dataList[index]["users"], overflow: TextOverflow.ellipsis,style: rubikTextStyle(25, FontWeight.w500, AppColor.colBlack),),
@@ -295,4 +339,70 @@ class ChartData {
   final Color color;
 
   ChartData(this.x, this.y, {this.color = Colors.blue});
+}
+
+
+class StackedColumnChart extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SfCartesianChart(
+      primaryXAxis: CategoryAxis(),
+      series: <CartesianSeries>[
+        StackedColumnSeries<SkillData, String>(
+          color: AppColor.colFbCircle,
+          dataSource: <SkillData>[
+            
+            SkillData('Person 1', 20, 30, 40),
+            SkillData('Person 2', 30, 40, 25),
+            SkillData('Person 3', 25, 35, 30),
+            SkillData('Person 4', 35, 25, 40),
+            SkillData('Person 5', 40, 20, 35),
+          ],
+          xValueMapper: (SkillData skill, _) => skill.person,
+          yValueMapper: (SkillData skill, _) => skill.skill1,
+          dataLabelSettings: DataLabelSettings(isVisible: true),
+          width: 0.8,
+        ),
+        StackedColumnSeries<SkillData, String>(
+          color: AppColor.colTeal,
+          dataSource: <SkillData>[
+
+            SkillData('Person 1', 20, 30, 40),
+            SkillData('Person 2', 30, 40, 25),
+            SkillData('Person 3', 25, 35, 30),
+            SkillData('Person 4', 35, 25, 40),
+            SkillData('Person 5', 40, 20, 35),
+          ],
+          xValueMapper: (SkillData skill, _) => skill.person,
+          yValueMapper: (SkillData skill, _) => skill.skill2,
+          dataLabelSettings: DataLabelSettings(isVisible: true),
+          width: 0.8,
+        ),
+        StackedColumnSeries<SkillData, String>(
+          color: AppColor.colRideFare,
+          dataSource: <SkillData>[
+            
+            SkillData('Person 1', 20, 30, 40),
+            SkillData('Person 2', 30, 40, 25),
+            SkillData('Person 3', 25, 35, 30),
+            SkillData('Person 4', 35, 25, 40),
+            SkillData('Person 5', 40, 20, 35),
+          ],
+          xValueMapper: (SkillData skill, _) => skill.person,
+          yValueMapper: (SkillData skill, _) => skill.skill3,
+          dataLabelSettings: DataLabelSettings(isVisible: true),
+          width: 0.8,
+        ),
+      ],
+    );
+  }
+}
+
+class SkillData {
+  final String person;
+  final int skill1;
+  final int skill2;
+  final int skill3;
+
+  SkillData(this.person, this.skill1, this.skill2, this.skill3);
 }
