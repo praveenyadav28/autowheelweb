@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:autowheelweb/desktop/addqueries.dart';
 import 'package:autowheelweb/desktop/searchProspect.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import '../Components/Sidemenu.dart';
 import '../Components/menuController.dart';
@@ -156,13 +157,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                            padding: EdgeInsets.symmetric(vertical: Sizes.height*0.01,horizontal: Sizes.width*0.04),
                           child: Column(
                             children: [
-                              ListTile(title: Text("Sales Colsed"),trailing: Container(height: 20,width: 20,decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
-          color: AppColor.colFbCircle,),),),
-                              ListTile(title: Text("In process"),trailing: Container(height: 20,width: 20,decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
-          color: AppColor.colTeal,),),),
-                              ListTile(title: Text("Not Interested"),trailing: Container(height: 20,width: 20,decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
-          color: AppColor.colRideFare,),),),
+                              
+                             
                               StackedColumnChart(),
+                              GridView.count(
+                                crossAxisCount: 2,
+                                childAspectRatio: 4,
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                children: [
+                                ListTile(dense:true,title: Text("Sales Colsed"), trailing: Container(height: 20,width: 20,decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
+                                              color: AppColor.colFbCircle,),),),
+                                ListTile(dense:true,title: Text("Lost"),trailing: Container(height: 20,width: 20,decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
+                                        color: AppColor.colYellow,),),),
+                                ListTile(dense:true,title: Text("In process"),trailing:  Container(height: 20,width: 20,decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
+                                            color: AppColor.colTeal,),) ),
+                                ListTile(dense:true,title: Text("Not Interested"),trailing: Container(height: 20,width: 20,decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),
+                                        color: AppColor.colRideFare,),),),
+                              ],)
                             ],
                           ))),
           SizedBox(height: Sizes.height*0.02,),
@@ -346,53 +358,85 @@ class StackedColumnChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SfCartesianChart(
-      primaryXAxis: CategoryAxis(),
+      primaryXAxis: CategoryAxis(
+    // Enable scrolling
+    autoScrollingDelta: 4,
+    autoScrollingMode: AutoScrollingMode.end,
+    maximumLabelWidth: 360, // Adjust label width as needed
+  ),
       series: <CartesianSeries>[
         StackedColumnSeries<SkillData, String>(
           color: AppColor.colFbCircle,
           dataSource: <SkillData>[
             
-            SkillData('Person 1', 20, 30, 40),
-            SkillData('Person 2', 30, 40, 25),
-            SkillData('Person 3', 25, 35, 30),
-            SkillData('Person 4', 35, 25, 40),
-            SkillData('Person 5', 40, 20, 35),
+            SkillData('Person 1', 20, 30, 40, 30),
+            SkillData('Person 2', 30, 40, 25, 30),
+            SkillData('Person 3', 25, 35, 30, 30),
+            SkillData('Person 4', 35, 25, 40, 30),
+            SkillData('Person 5', 40, 20, 35, 30),
+            SkillData('Person 6', 40, 20, 35, 30),
+            SkillData('Person 7', 40, 20, 35, 30),
           ],
           xValueMapper: (SkillData skill, _) => skill.person,
-          yValueMapper: (SkillData skill, _) => skill.skill1,
-          dataLabelSettings: DataLabelSettings(isVisible: true),
-          width: 0.8,
+      yValueMapper: (SkillData skill, _) => skill.skill1,
+      dataLabelSettings: DataLabelSettings(isVisible: true),
+      width: 0.8,
+    
         ),
         StackedColumnSeries<SkillData, String>(
           color: AppColor.colTeal,
           dataSource: <SkillData>[
 
-            SkillData('Person 1', 20, 30, 40),
-            SkillData('Person 2', 30, 40, 25),
-            SkillData('Person 3', 25, 35, 30),
-            SkillData('Person 4', 35, 25, 40),
-            SkillData('Person 5', 40, 20, 35),
+            SkillData('Person 1', 20, 30, 40,30),
+            SkillData('Person 2', 30, 40, 25,30),
+            SkillData('Person 3', 25, 35, 30,30),
+            SkillData('Person 4', 35, 25, 40,30),
+            SkillData('Person 5', 40, 20, 35,30),
+            SkillData('Person 6', 40, 20, 35,30),
+            SkillData('Person 7', 40, 20, 35,30),
           ],
           xValueMapper: (SkillData skill, _) => skill.person,
           yValueMapper: (SkillData skill, _) => skill.skill2,
           dataLabelSettings: DataLabelSettings(isVisible: true),
           width: 0.8,
         ),
+        
         StackedColumnSeries<SkillData, String>(
           color: AppColor.colRideFare,
           dataSource: <SkillData>[
             
-            SkillData('Person 1', 20, 30, 40),
-            SkillData('Person 2', 30, 40, 25),
-            SkillData('Person 3', 25, 35, 30),
-            SkillData('Person 4', 35, 25, 40),
-            SkillData('Person 5', 40, 20, 35),
+            SkillData('Person 1', 20, 30, 40, 30),
+            SkillData('Person 2', 30, 40, 25, 30),
+            SkillData('Person 3', 25, 35, 30, 30),
+            SkillData('Person 4', 35, 25, 40, 30),
+            SkillData('Person 5', 40, 20, 35, 30),
+            SkillData('Person 6', 40, 20, 35, 30),
+            SkillData('Person 7', 40, 20, 35, 30),
           ],
           xValueMapper: (SkillData skill, _) => skill.person,
           yValueMapper: (SkillData skill, _) => skill.skill3,
           dataLabelSettings: DataLabelSettings(isVisible: true),
           width: 0.8,
         ),
+      
+        StackedColumnSeries<SkillData, String>(
+          color: AppColor.colYellow,
+          dataSource: <SkillData>[
+            
+            SkillData('Person 1', 20, 30, 40, 30),
+            SkillData('Person 2', 30, 40, 25, 30),
+            SkillData('Person 3', 25, 35, 30, 30),
+            SkillData('Person 4', 35, 25, 40, 30),
+            SkillData('Person 5', 40, 20, 35, 30),
+            SkillData('Person 6', 40, 20, 35, 30),
+            SkillData('Person 7', 40, 20, 35, 30),
+          ],
+          xValueMapper: (SkillData skill, _) => skill.person,
+          yValueMapper: (SkillData skill, _) => skill.skill3,
+          dataLabelSettings: DataLabelSettings(isVisible: true),
+          width: 0.8,
+        ),
+      
       ],
     );
   }
@@ -403,6 +447,7 @@ class SkillData {
   final int skill1;
   final int skill2;
   final int skill3;
+  final int skill4;
 
-  SkillData(this.person, this.skill1, this.skill2, this.skill3);
+  SkillData(this.person, this.skill1, this.skill2, this.skill3,this.skill4);
 }

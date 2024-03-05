@@ -48,6 +48,7 @@ class _ReportScreenState extends State<ReportScreen> {
   void initState() {
     super.initState();
     // Call getLocation in initState
+    
     getLocation();
   }
 

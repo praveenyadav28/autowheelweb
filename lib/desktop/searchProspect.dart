@@ -22,15 +22,19 @@ class _SearchProspectState extends State<SearchProspect> {
             centerTitle: true,
         title: Text("Search Prospect", overflow: TextOverflow.ellipsis),
       ),
-      backgroundColor: AppColor.colPrimary.withOpacity(.1),
-      body: SingleChildScrollView(
-         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: Sizes.width * 0.05,vertical: Sizes.height*0.02),
-           child: Column(children: [
-            textformfiles(_mobileController,labelText: 'Mobile No. / Customer Name',prefixIcon: Icon(Icons.search,size: 30,color: AppColor.colBlack,))
-           ],),
+      backgroundColor: AppColor.colWhite,
+      body: Container(
+        height: Sizes.height,
+        color: AppColor.colPrimary.withOpacity(.1),
+        child: SingleChildScrollView(
+           child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: Sizes.width * 0.05,vertical: Sizes.height*0.02),
+             child: Column(children: [
+              textformfiles(_mobileController,labelText: 'Mobile No. / Customer Name',prefixIcon: Icon(Icons.search,size: 30,color: AppColor.colBlack,))
+             ],),
+           ),
          ),
-       )
+      )
     );
   }
 }

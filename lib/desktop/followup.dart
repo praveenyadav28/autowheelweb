@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:autowheelweb/Components/menuController.dart';
 import 'package:autowheelweb/Utils/colors.dart';
@@ -26,61 +27,33 @@ class FollowUpScreen extends StatefulWidget {
 }
 
 class _FollowUpScreenState extends State<FollowUpScreen> {
-  TextEditingController RefController = TextEditingController();
-  TextEditingController BlankController = TextEditingController();
-  TextEditingController splController = TextEditingController();
-  TextEditingController ActionController = TextEditingController();
-  TextEditingController ContactController = TextEditingController();
-  TextEditingController ContactnumbarController = TextEditingController();
-  TextEditingController RemarksController = TextEditingController();
-  TextEditingController _appointmentDate = TextEditingController(
+  TextEditingController _refController = TextEditingController();
+  TextEditingController _splController = TextEditingController();
+  TextEditingController _contactController = TextEditingController();
+  TextEditingController _contactnumbarController = TextEditingController();
+  TextEditingController _remarksController = TextEditingController();
+  final TextEditingController _appointmentDate = TextEditingController(
     text: DateFormat('yyyy/MM/dd').format(DateTime.now()),
   );
-  List<Map<String, dynamic>> dateList = [];
-  String ? selectedVisitorName ;
+  List<Map<String, dynamic>> customerdataList = [];
   Map<String, dynamic>? selectedcustomerValue;
-  // int customerId = 0;
   final TextEditingController customerController = TextEditingController();
-  // int? selectedPrionaityId;
   int? selectedVisitorId;
-  //
-  List<Map<String, dynamic>> Prionaity = [  ];
-  Map<String, dynamic>? selectedValue;
-  // int proirityId = 0;
-  final TextEditingController textEditingController = TextEditingController();
-  int? selectedPrionaityId;
-  //
+
+  //Priority
+   final List<Map<String, dynamic>> priorityDataList = [ {'id': 0, 'name': 'Cold'},{'id': 1, 'name': 'Normal'},{'id': 2, 'name': 'Hot'}];
+  int selectedPriorityId = 0;
+
+  //Follow Type
   List<Map<String, dynamic>> Folowtype = [ ];
-  String? selectedFolowtypeName;
-  // int? selectedFolowtypeId;
   Map<String, dynamic>? selectedfollowupValue;
   int? followupid;
   final TextEditingController FollowupController = TextEditingController();
-  // int? selectedPrionaityId;
+
   //
 
-  String conttact = "";
-  String remark = "";
-  String page = "";
-  String time = '';
+
   List<Map<String, String>> dataList = [];
-  @override
-
-  // void updateTableValues() {
-  //   setState(() {
-  //     conttact = ContactController.text;
-  //     remark = RemarksController.text;
-  //     page = datepickar.text;
-  //          Map<String, String> newData = {
-  //       'Name': conttact,
-  //       'Age': remark,
-  //       'Page': page,
-  //       'time': time
-  //     };
-  //     dataList.add(newData);
-  //   });
-  // }
-
   late TimeOfDay _selectedTime = TimeOfDay.now();
   Future<void> contactTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
@@ -104,7 +77,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
   }
 
   refreshData() async {
-    await prionaityDeta();
+    await
     followtypeDeta();
     customer();
     PrefixData();
@@ -115,13 +88,12 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
     super.initState();
     setState(() {
       _selectedTime = TimeOfDay.now();
-      prionaityDeta();
       startTimer();
       followtypeDeta();
       customer();
       refreshData();
     });
-    RefController.text = widget.refnom == null ? "" : widget.refnom.toString();
+    _refController.text = widget.refnom == null ? "" : widget.refnom.toString();
     // Prionaity.clear();
     // Prionaity.add({'id': 0, 'name': 'Prionaity'});
     // prionaityDeta().then((_) {
@@ -136,8 +108,8 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
 
   @override
   void dispose() {
-    splController.clear();
-    RemarksController.clear();
+    _splController.clear();
+    _remarksController.clear();
 
     super.dispose();
   }
@@ -169,7 +141,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
       body:  Container(
         height: Sizes.height,
         color: AppColor.colPrimary.withOpacity(.1),
-        child: dateList.isEmpty
+        child: customerdataList.isEmpty
                   ? Center(
           child: CircularProgressIndicator(),  )
                   :SingleChildScrollView(
@@ -179,118 +151,93 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
                   horizontal: Sizes.width * 0.04),
               child: Column(
                 children: [
-                  textformfiles(RefController,
+                  textformfiles(_refController,
                       keyboardType: TextInputType.number, onChanged: (e) {
                     setState(() {
                       PrefixData();
                     });
                   }, labelText: "Ref.No"),
                   SizedBox(height: Sizes.height * 0.02),
-                     dropdownTextfield(
-                          'Select customer',
-                          searchDropDown(
-                            'Select customer',
-                            dateList
-                                .map((item) => DropdownMenuItem(
-                                      onTap: () {
-                                        selectedVisitorId = item['id'];
-                                      },
-                                      value: item,
-                                      child: Text(
-                                        item['customer_Name'].toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ))
-                                .toList(),
-                            selectedcustomerValue,
-                            (value) {
-                              setState(() {
-                                selectedcustomerValue = value;
-                              });
-                            },
-                            customerController,
-                            (value) {
-                              setState(() {
-                                // Filter the Prionaity list based on the search value
-                                dateList
-                                    .where((item) => item['customer_Name']
-                                        .toString()
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()))
-                                    .toList();
-                              });
-                            },
-                            "Search for a customer...",
-                            (isOpen) {
-                              if (!isOpen) {
-                                customerController.clear();
-                              }
-                            },
-                          ),
-                        ),
+                    //  dropdownTextfield(
+                    //       'Select customer',
+                    //       searchDropDown(
+                    //         'Select customer',
+                    //         customerdataList
+                    //             .map((item) => DropdownMenuItem(
+                    //                   onTap: () {
+                    //                     selectedVisitorId = item['id'];
+                    //                   },
+                    //                   value: item,
+                    //                   child: Text(
+                    //                     item['customer_Name'].toString(),
+                    //                     style: const TextStyle(
+                    //                         fontSize: 16,
+                    //                         fontWeight: FontWeight.bold),
+                    //                   ),
+                    //                 ))
+                    //             .toList(),
+                    //         selectedcustomerValue,
+                    //         (value) {
+                    //           setState(() {
+                    //             selectedcustomerValue = value;
+                    //           });
+                    //         },
+                    //         customerController,
+                    //         (value) {
+                    //           setState(() {
+                    //             // Filter the Prionaity list based on the search value
+                    //             customerdataList
+                    //                 .where((item) => item['customer_Name']
+                    //                     .toString()
+                    //                     .toLowerCase()
+                    //                     .contains(value.toLowerCase()))
+                    //                 .toList();
+                    //           });
+                    //         },
+                    //         "Search for a customer...",
+                    //         (isOpen) {
+                    //           if (!isOpen) {
+                    //             customerController.clear();
+                    //           }
+                    //         },
+                    //       ),
+                    //     ),
+                       textformfiles(_contactController,labelText: "Customer Name",maxLength: 10),
+               
                           SizedBox(
                     height: Sizes.height * 0.02,
                   ),
-                textformfiles(ContactnumbarController,keyboardType: TextInputType.number,labelText: "Contact Numbar",maxLength: 10),
+                textformfiles(_contactnumbarController,keyboardType: TextInputType.number,labelText: "Contact Numbar",maxLength: 10),
                   SizedBox(height: Sizes.height * 0.02),
-                  textformfiles(splController, labelText: "Spl.Remarks"),
+                  textformfiles(_splController, labelText: "Spl.Remarks"),
                   SizedBox(height: Sizes.height * 0.02),
-                  textformfiles(RemarksController, labelText: "Remarks"),
+                  textformfiles(_remarksController, labelText: "Remarks"),
                   SizedBox(height: Sizes.height * 0.02),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: dropdownTextfield(
-                          "Select Priority",searchDropDown('Select Priority', Prionaity.map((item) => DropdownMenuItem(
-                                    onTap: () {
-                                      selectedPrionaityId = item['id'];
-                                    },
-                                    value: item,
-                                    child: Text(
-                                      item['name'].toString(),
-                                      style: rubikTextStyle(
-                                          16,
-                                          FontWeight.w500,
-                                          AppColor.colBlack),
-                                    ),
-                                  )).toList(), selectedValue, (value) {
-                                setState(() {
-                                  selectedValue = value;
-                                });
-                              }, textEditingController,  (value) {
-                                      setState(() {
-                                        // Filter the Prionaity list based on the search value
-                                        Prionaity.where((item) => item['name']
-                                                .toString()
-                                                .toLowerCase()
-                                                .contains(
-                                                    value.toLowerCase()))
-                                            .toList();
-                                      });
-                                    }, 'Search for a priority...',  (isOpen) {
-                                if (!isOpen) {
-                                  textEditingController.clear();
-                                }
-                              })
-                        ),
-                      ),
-                      SizedBox(width: Sizes.width * 0.02),
-                      addDefaultButton(
-                        () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AddGroupScreen(
-                                        sourecID: 22,
-                                        name: "Priority",
-                                      ))).then((value) => refreshData());
-                        },
-                      )
-                    ],
-                  ),
-                  SizedBox(height: Sizes.height * 0.02),
+                dropdownTextfield(
+                  "Priority",
+                 DropdownButton<int>(
+                underline: Container(),
+              value: selectedPriorityId,
+              items: priorityDataList.map((data) {
+                return DropdownMenuItem<int>(
+                  value: data['id'],
+                  child: Text(data['name'],
+        style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),),
+                );
+              }).toList(), icon: Icon(
+      Icons.keyboard_arrow_down_outlined
+    ),
+    isExpanded: true,
+    
+              onChanged: (selectedId) {
+                setState(() {
+                  selectedPriorityId = selectedId!;
+                  log(selectedPriorityId.toString());
+                  // Call function to make API request
+                });
+              },
+            ),  ),
+                   SizedBox(height: Sizes.height * 0.02),
                   Row(
                     children: [
                        Expanded(
@@ -403,8 +350,8 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
                       onTap: () {
                         postFollowUp(context);
                         // updateTableValues();
-                        // ContactController.clear();
-                        // RemarksController.clear();
+                        // _contactController.clear();
+                        // _remarksController.clear();
                         // datepickar.clear();
                       },
                       child: Button("Save", AppColor.colPrimary)),
@@ -418,28 +365,6 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
           ),
       ),
     );
-  }
-
-  Future<void> prionaityDeta() async {
-    final url = Uri.parse(
-        'http://lms.muepetro.com/api/UserController1/GetMiscMaster?MiscTypeId=22');
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final List<Goruppartmodel> goruppartmodelList =
-            grouppartmodelFromJson(response.body);
-            Prionaity.clear();
-        for (var item in goruppartmodelList) {
-          Prionaity.add({'id': item.id, 'name': item.name});
-        }
-        setState(() {});
-      } else {
-        print('Request failed with status: ${response.statusCode}');
-        print('Response Data: ${response.body}');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
   }
 
   Future<void> followtypeDeta() async {
@@ -475,10 +400,10 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
           List<Map<String, dynamic>>.from(decodedList);
 
       setState(() {
-        dateList = mappedList;
-        if (dateList.isNotEmpty) {
-          selectedVisitorName = dateList[0]['customer_Name'];
-          selectedVisitorId = dateList[0]['id'];
+        customerdataList = mappedList;
+        if (customerdataList.isNotEmpty) {
+          // selectedVisitorName = customerdataList[0]['customer_Name'];
+          selectedVisitorId = customerdataList[0]['id'];
         }
       });
     } else {
@@ -493,17 +418,17 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
     Map<String, dynamic> followUpData = {
       "Location_Id": 12,
       "Prefix_Name": "online",
-      "Ref_No": int.parse(RefController.text),
-      "Customer_Name": ContactController.text.toString(),
+      "Ref_No": int.parse(_refController.text),
+      "Customer_Name": _contactController.text.toString(),
       "Contacted_Date": DateFormat('yyyy/MM/dd').format(DateTime.now()),
       "Contacted_Time": "${TimeOfDay.now().hour}:${TimeOfDay.now().minute}",
       "Follow_Type": followupid,
       "Appointment_Date": _appointmentDate.text.toString(),
       "Appointment_Time": "${_selectedTime.hour}:${_selectedTime.minute}",
-      "Remarks": RemarksController.text.toString(),
-      "Remark_Special": splController.text.toString(),
+      "Remarks": _remarksController.text.toString(),
+      "Remark_Special": _splController.text.toString(),
       "ActionTaken": "ActionTaken",
-      "Priority": selectedPrionaityId,
+      "Priority": selectedPriorityId,
       "EnquiryStatus": 1,
       "Reason": "Reason",
       "VehiclePurchase": "VehiclePurchase"
@@ -554,7 +479,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
     print(1);
     try {
       final response = await http.get(
-        Uri.parse('http://lms.muepetro.com/api/UserController1/GetFollowUpData?prefix=Online&refno=${RefController.text}&locationid=2'),
+        Uri.parse('http://lms.muepetro.com/api/UserController1/GetFollowUpData?prefix=Online&refno=${_refController.text}&locationid=2'),
       );
 
       if (response.statusCode == 200) {
@@ -564,30 +489,26 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
           Map<String, dynamic> data = dataList[0];
 
           setState(() {
-            ContactController.text = data['customer_Name'] ?? '';
-            ContactnumbarController.text = data['mob_No'] ?? '';
-            RemarksController.text = data['remarks'] ?? '';
-            splController.text = data['remark_Special'] ?? '';
-            selectedPrionaityId = data['priority'];
+            _contactController.text = data['customer_Name'] ?? '';
+            _contactnumbarController.text = data['mob_No'] ?? '';
+            _remarksController.text = data['remarks'] ?? '';
+            _splController.text = data['remark_Special'] ?? '';
+            selectedPriorityId = data['priority'];
             followupid = data['follow_Type'];
             // selectedVisitorId = 76;
-            selectedValue = Prionaity.firstWhere(
-              (item) => item['id'] == selectedPrionaityId,
-              orElse: () => Prionaity[0],
-            );
             selectedfollowupValue = Folowtype.firstWhere(
               (item) => item['id'] == followupid,
               orElse: () => Folowtype[0],
             );
-            selectedcustomerValue = dateList.firstWhere(
+            selectedcustomerValue = customerdataList.firstWhere(
               (item) => item['id'] == selectedVisitorId,
-              orElse: () => dateList[0],
+              orElse: () => customerdataList[0],
             );
           });
         } else {
-          ContactController.clear();
-          RemarksController.clear();
-          splController.clear();
+          _contactController.clear();
+          _remarksController.clear();
+          _splController.clear();
           print("Empty data list");
         }
       } else {
