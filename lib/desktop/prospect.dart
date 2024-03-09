@@ -710,7 +710,7 @@ final List<Map<String, dynamic>> priorityDataList = [
              SizedBox(height: Sizes.height * 0.02),
               textformfiles(_schemeController, labelText: "Scheme"),
               SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_incomeController, labelText: "Income"),
+              textformfiles(_incomeController, labelText: "Income",keyboardType: TextInputType.number),
               SizedBox(height: Sizes.height * 0.05),
               Text(
                 "Intersted in following product",

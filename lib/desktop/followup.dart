@@ -12,7 +12,6 @@ import 'package:autowheelweb/Utils/textfield.dart';
 import 'package:autowheelweb/Utils/textstyle.dart';
 import 'package:autowheelweb/model/group.dart';
 import 'package:autowheelweb/model/prospect_modal.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -27,22 +26,25 @@ class FollowUpScreen extends StatefulWidget {
 }
 
 class _FollowUpScreenState extends State<FollowUpScreen> {
-  TextEditingController _refController = TextEditingController();
-  TextEditingController _splController = TextEditingController();
-  TextEditingController _contactController = TextEditingController();
-  TextEditingController _contactnumbarController = TextEditingController();
-  TextEditingController _remarksController = TextEditingController();
+  final TextEditingController _refController = TextEditingController();
+  final TextEditingController _splController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
+  final TextEditingController _contactnumberController = TextEditingController();
+  final TextEditingController _remarksController = TextEditingController();
   final TextEditingController _appointmentDate = TextEditingController(
     text: DateFormat('yyyy/MM/dd').format(DateTime.now()),
   );
-  List<Map<String, dynamic>> customerdataList = [];
-  Map<String, dynamic>? selectedcustomerValue;
-  final TextEditingController customerController = TextEditingController();
-  int? selectedVisitorId;
+  // List<Map<String, dynamic>> customerdataList = [];
+  // Map<String, dynamic>? selectedcustomerValue;
+  // final TextEditingController customerController = TextEditingController();
+  // int? selectedVisitorId;
 
   //Priority
    final List<Map<String, dynamic>> priorityDataList = [ {'id': 0, 'name': 'Cold'},{'id': 1, 'name': 'Normal'},{'id': 2, 'name': 'Hot'}];
   int selectedPriorityId = 0;
+
+//Data
+List getAllRemarkList = [];
 
   //Follow Type
   List<Map<String, dynamic>> Folowtype = [ ];
@@ -79,7 +81,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
   refreshData() async {
     await
     followtypeDeta();
-    customer();
+    // customer();
     PrefixData();
   }
 
@@ -90,7 +92,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
       _selectedTime = TimeOfDay.now();
       startTimer();
       followtypeDeta();
-      customer();
+      // customer();
       refreshData();
     });
     _refController.text = widget.refnom == null ? "" : widget.refnom.toString();
@@ -110,6 +112,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
   void dispose() {
     _splController.clear();
     _remarksController.clear();
+    _contactnumberController.clear();
 
     super.dispose();
   }
@@ -141,10 +144,12 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
       body:  Container(
         height: Sizes.height,
         color: AppColor.colPrimary.withOpacity(.1),
-        child: customerdataList.isEmpty
-                  ? Center(
-          child: CircularProgressIndicator(),  )
-                  :SingleChildScrollView(
+        child: 
+        // customerdataList.isEmpty
+        //           ? Center(
+        //   child: CircularProgressIndicator(),  )
+                  // :
+                  SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(
                   vertical: Sizes.height * 0.02,
@@ -207,20 +212,20 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
                           SizedBox(
                     height: Sizes.height * 0.02,
                   ),
-                textformfiles(_contactnumbarController,keyboardType: TextInputType.number,labelText: "Contact Numbar",maxLength: 10),
+                textformfiles(_contactnumberController,keyboardType: TextInputType.number,labelText: "Contact Number",maxLength: 10),
                   SizedBox(height: Sizes.height * 0.02),
-                  textformfiles(_splController, labelText: "Spl.Remarks"),
+                  textformfiles(_splController, labelText: "Special Remarks"),
                   SizedBox(height: Sizes.height * 0.02),
                   textformfiles(_remarksController, labelText: "Remarks"),
                   SizedBox(height: Sizes.height * 0.02),
                 dropdownTextfield(
                   "Priority",
-                 DropdownButton<int>(
+                 DropdownButton<Map<String, dynamic>>(
                 underline: Container(),
-              value: selectedPriorityId,
+                value: priorityDataList.firstWhere((item) => item['id'] == selectedPriorityId),
               items: priorityDataList.map((data) {
-                return DropdownMenuItem<int>(
-                  value: data['id'],
+                return DropdownMenuItem<Map<String, dynamic>>(
+                  value: data,
                   child: Text(data['name'],
         style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),),
                 );
@@ -231,7 +236,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
     
               onChanged: (selectedId) {
                 setState(() {
-                  selectedPriorityId = selectedId!;
+                  selectedPriorityId = selectedId!['id'];
                   log(selectedPriorityId.toString());
                   // Call function to make API request
                 });
@@ -303,8 +308,8 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
                             await showDatePicker(
                               context: context,
                               initialDate: DateTime.now(),
-                              firstDate: DateTime(1900),
-                              lastDate: DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(2100),
                             ).then((selectedDate) {
                               if (selectedDate != null) {
                                 _appointmentDate.text = DateFormat('dd-MM-yyyy')
@@ -356,9 +361,19 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
                       },
                       child: Button("Save", AppColor.colPrimary)),
                   SizedBox(
-                    height: Sizes.height * 0.02,
+                    height: Sizes.height * 0.02
                   ),
                   Button("Delete", AppColor.colRideFare),
+                   SizedBox(
+                    height: Sizes.height * 0.02
+                  ),
+                ...List.generate(getAllRemarkList.length, (index) {
+                  return ListTile(
+            leading:Text("${index+1}"),
+            title:Text("Last Remark : ${getAllRemarkList[index]['remarks']}"),
+            trailing: Text('${getAllRemarkList[index]['contacted_Date']}'.substring(0, getAllRemarkList[index]['lastContact_Date'].length!=null?getAllRemarkList[index]['lastContact_Date'].length - 12:0)),
+                  );
+                })
                 ],
               ),
             ),
@@ -382,7 +397,6 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
         }
         setState(() {});
       } else {
-        print('Request failed with status: ${response.statusCode}');
         print('Response Data: ${response.body}');
       }
     } catch (e) {
@@ -390,29 +404,31 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
     }
   }
 
-  Future<void> customer() async {
-    final response = await http.get(
-        Uri.parse('http://lms.muepetro.com/api/UserController1/GetProspect'));
+  // Future<void> customer() async {
+  //   final response = await http.get(
+  //       Uri.parse('http://lms.muepetro.com/api/UserController1/GetProspect'));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> decodedList = json.decode(response.body);
-      final List<Map<String, dynamic>> mappedList =
-          List<Map<String, dynamic>>.from(decodedList);
+  //   if (response.statusCode == 200) {
+  //     final List<dynamic> decodedList = json.decode(response.body);
+      
+  //     getAlldataList = decodedList;
+  //     final List<Map<String, dynamic>> mappedList =
+  //         List<Map<String, dynamic>>.from(decodedList);
 
-      setState(() {
-        customerdataList = mappedList;
-        if (customerdataList.isNotEmpty) {
-          // selectedVisitorName = customerdataList[0]['customer_Name'];
-          selectedVisitorId = customerdataList[0]['id'];
-        }
-      });
-    } else {
-      throw Exception('Failed to load data');
-    }
-  }
+  //     setState(() {
+  //       customerdataList = mappedList;
+  //       if (customerdataList.isNotEmpty) {
+  //         // selectedVisitorName = customerdataList[0]['customer_Name'];
+  //         selectedVisitorId = customerdataList[0]['id'];
+  //       }
+  //     });
+  //   } else {
+  //     throw Exception('Failed to load data');
+  //   }
+  // }
+
 
   void postFollowUp(BuildContext context) async {
-    print(1);
     final String apiUrl =
         "http://lms.muepetro.com/api/UserController1/PostFollowUp";
     Map<String, dynamic> followUpData = {
@@ -427,14 +443,12 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
       "Appointment_Time": "${_selectedTime.hour}:${_selectedTime.minute}",
       "Remarks": _remarksController.text.toString(),
       "Remark_Special": _splController.text.toString(),
-      "ActionTaken": "ActionTaken",
+      "ActionTaken": "Not Set Yet",
       "Priority": selectedPriorityId,
       "EnquiryStatus": 1,
-      "Reason": "Reason",
-      "VehiclePurchase": "VehiclePurchase"
+      "Reason": "Not Set Yet",
+      "VehiclePurchase": "Not Set Yet"
     };
-    print(followUpData);
-    print(2);
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -443,19 +457,14 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
         },
         body: jsonEncode(followUpData),
       );
-      print(3);
       if (response.statusCode == 200) {
-        print(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(response.body),
             backgroundColor: Colors.green,
           ),
         );
-        print(4);
       } else {
-        print("Error posting follow-up: ${response.statusCode}");
-        print(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Error posting follow-up: ${response.statusCode}"),
@@ -463,8 +472,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
           ),
         );
       }
-      print(5);
-    } catch (e) {
+        } catch (e) {
       print("Exception during follow-up post: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -476,45 +484,44 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
   }
 
   Future<void> PrefixData() async {
-    print(1);
     try {
       final response = await http.get(
-        Uri.parse('http://lms.muepetro.com/api/UserController1/GetFollowUpData?prefix=Online&refno=${_refController.text}&locationid=2'),
+        Uri.parse('http://lms.muepetro.com/api/UserController1/GetFollowUpData?prefix=Online&refno=${_refController.text}&locationid=1'),
       );
 
       if (response.statusCode == 200) {
         List<dynamic> dataList = json.decode(response.body);
 
         if (dataList.isNotEmpty) {
+               getAllRemarkList = dataList;
           Map<String, dynamic> data = dataList[0];
 
           setState(() {
             _contactController.text = data['customer_Name'] ?? '';
-            _contactnumbarController.text = data['mob_No'] ?? '';
+            _contactnumberController.text = data['mob_No'] ?? '';
             _remarksController.text = data['remarks'] ?? '';
             _splController.text = data['remark_Special'] ?? '';
-            selectedPriorityId = data['priority'];
+            selectedPriorityId = int.parse(data['priority'])??0;
             followupid = data['follow_Type'];
             // selectedVisitorId = 76;
             selectedfollowupValue = Folowtype.firstWhere(
               (item) => item['id'] == followupid,
               orElse: () => Folowtype[0],
             );
-            selectedcustomerValue = customerdataList.firstWhere(
-              (item) => item['id'] == selectedVisitorId,
-              orElse: () => customerdataList[0],
-            );
+            // selectedcustomerValue = customerdataList.firstWhere(
+            //   (item) => item['id'] == selectedVisitorId,
+            //   orElse: () => customerdataList[0],
+            // );
           });
         } else {
           _contactController.clear();
           _remarksController.clear();
           _splController.clear();
-          print("Empty data list");
+          _contactnumberController.clear();
         }
       } else {
         throw Exception('Failed to load data');
       }
-      print(4);
     } catch (error) {
       print('Error: $error');
     }

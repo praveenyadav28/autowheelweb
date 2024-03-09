@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:autowheelweb/desktop/addqueries.dart';
 import 'package:autowheelweb/desktop/searchProspect.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import '../Components/Sidemenu.dart';
 import '../Components/menuController.dart';
@@ -157,9 +156,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                            padding: EdgeInsets.symmetric(vertical: Sizes.height*0.01,horizontal: Sizes.width*0.04),
                           child: Column(
                             children: [
-                              
-                             
-                              StackedColumnChart(),
+  SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        width: Sizes.width*1.4,
+                      child:    StackedColumnChart(),
+                          ),),
                               GridView.count(
                                 crossAxisCount: 2,
                                 childAspectRatio: 4,
@@ -359,10 +361,8 @@ class StackedColumnChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return SfCartesianChart(
       primaryXAxis: CategoryAxis(
-    // Enable scrolling
-    autoScrollingDelta: 4,
-    autoScrollingMode: AutoScrollingMode.end,
-    maximumLabelWidth: 360, // Adjust label width as needed
+        // initialZoomFactor: .6,
+    maximumLabelWidth: 200, // Adjust label width as needed
   ),
       series: <CartesianSeries>[
         StackedColumnSeries<SkillData, String>(
@@ -423,16 +423,16 @@ class StackedColumnChart extends StatelessWidget {
           color: AppColor.colYellow,
           dataSource: <SkillData>[
             
-            SkillData('Person 1', 20, 30, 40, 30),
-            SkillData('Person 2', 30, 40, 25, 30),
-            SkillData('Person 3', 25, 35, 30, 30),
+            SkillData('Person 1', 10, 30, 40, 25),
+            SkillData('Person 2', 30, 40, 25, 40),
+            SkillData('Person 3', 25, 35, 30, 50),
             SkillData('Person 4', 35, 25, 40, 30),
-            SkillData('Person 5', 40, 20, 35, 30),
-            SkillData('Person 6', 40, 20, 35, 30),
+            SkillData('Person 5', 40, 20, 35, 25),
+            SkillData('Person 6', 40, 20, 35, 35),
             SkillData('Person 7', 40, 20, 35, 30),
           ],
           xValueMapper: (SkillData skill, _) => skill.person,
-          yValueMapper: (SkillData skill, _) => skill.skill3,
+          yValueMapper: (SkillData skill, _) => skill.skill4,
           dataLabelSettings: DataLabelSettings(isVisible: true),
           width: 0.8,
         ),
