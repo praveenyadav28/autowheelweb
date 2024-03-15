@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, non_constant_identifier_names, camel_case_types, prefer_const_constructors, unused_import, prefer_const_constructors_in_immutables
+// ignore_for_file: file_names, non_constant_identifier_names, camel_case_types, prefer_const_constructors, unused_import, prefer_const_constructors_in_immutables, library_private_types_in_public_api
 
 import 'dart:convert';
 
@@ -46,51 +46,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
       "color": Colors.yellow.withOpacity(0.6),
       "title": "Total Leads",
       "users": "50"
-    },
-    // {
-    //   "icon": Icon(Icons.no_accounts),
-    //   "color": Colors.orange.withOpacity(0.6),
-    //   "title": "Blocked",
-    //   "users": "80"
-    // },
+    }
   ];
-  final List<Map<String, dynamic>> registrationList = [
-    {
-      "color": Colors.red.withOpacity(0.1),
-      "title": "Today Register",
-      "users": "163"
-    },
-    {
-      "color": Colors.blue.withOpacity(0.1),
-      "title": "Weakly Register",
-      "users": "570"
-    },
-    {
-      "color": Colors.green.withOpacity(0.1),
-      "title": "Monthly Register",
-      "users": "1280",
-    },
-  ];
-  final List<Map<String, dynamic>> userList = [
-    {
-      "color": Colors.red.withOpacity(0.1),
-      "title": "Male",
-      "title2": "Female",
-      "users": "1163",
-      "user2": "1378",
-      "icon": Icon(Icons.man),
-      "icon2": Icon(Icons.woman),
-    },
-    {
-      "color": Colors.blue.withOpacity(0.1),
-      "title": "Android",
-      "title2": "Iphone",
-      "users": "1570",
-      "user2": "992",
-      "icon": Icon(Icons.phone_android),
-      "icon2": Icon(Icons.phone_iphone),
-    },
-  ];
+   String _selectedFilter = 'Weekly';
+
+  void _showFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Select Filter'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                _buildFilterOption('Weekly'),
+                _buildFilterOption('Yearly'),
+                _buildFilterOption('Quarterly'),
+                _buildFilterOption('Daily'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFilterOption(String filter) {
+    return ListTile(
+      title: Text(filter),
+      onTap: () {
+        setState(() {
+          _selectedFilter = filter;
+        });
+        Navigator.of(context).pop();
+      },
+      selected: _selectedFilter == filter,
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 icon: const Icon(Icons.menu))
             : Container(),
             centerTitle: true,
-        title: Text("Welcome Mohan", overflow: TextOverflow.ellipsis),
+        title: Text("Dashboard", overflow: TextOverflow.ellipsis),
       ),
       backgroundColor: AppColor.colPrimary.withOpacity(.2),
       body: SingleChildScrollView(
@@ -156,9 +149,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                            padding: EdgeInsets.symmetric(vertical: Sizes.height*0.01,horizontal: Sizes.width*0.04),
                           child: Column(
                             children: [
+                               ListTile(
+                               
+                                title: Text("Customer Status",style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack,)),
+                                trailing: IconButton(
+                  onPressed: (){
+          _showFilterDialog();
+                  },
+                   icon: Column(
+                     children: [
+                       Icon(Icons.filter_alt_outlined,color: AppColor.colPrimary,size: 20,),
+                       Text("Filter",style: rubikTextStyle(10, FontWeight.w500, AppColor.colPrimary),)
+                     ],
+                   ),
+                 ),
+                                ),  
   SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Container(
+      child: SizedBox(
         width: Sizes.width*1.4,
                       child:    StackedColumnChart(),
                           ),),
@@ -357,6 +365,8 @@ class ChartData {
 
 
 class StackedColumnChart extends StatelessWidget {
+  const StackedColumnChart({super.key});
+
   @override
   Widget build(BuildContext context) {
     return SfCartesianChart(

@@ -5,7 +5,7 @@ class MyDropdown extends StatelessWidget {
   final void Function(PriorityClass?)? onChanged;
   final PriorityClass? initialValue;
 
-  MyDropdown({
+  const MyDropdown({super.key, 
     required this.priorityList,
     this.onChanged,
     this.initialValue,

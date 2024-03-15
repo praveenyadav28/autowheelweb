@@ -1,15 +1,17 @@
-// ignore_for_file: prefer_const_declarations, override_on_non_overriding_member, non_constant_identifier_names, prefer_const_constructors, duplicate_ignore, must_be_immutable, avoid_print, use_build_context_synchronously
+// ignore_for_file: prefer_const_declarations, override_on_non_overriding_member, non_constant_identifier_names, prefer_const_constructors, duplicate_ignore, must_be_immutable, avoid_print, use_build_context_synchronously, unnecessary_null_comparison
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
 import 'package:autowheelweb/Components/menuController.dart';
+import 'package:autowheelweb/Utils/api.dart';
 import 'package:autowheelweb/Utils/colors.dart';
 import 'package:autowheelweb/Utils/mediaquery.dart';
 import 'package:autowheelweb/Utils/responsive.dart';
 import 'package:autowheelweb/Utils/textfield.dart';
 import 'package:autowheelweb/Utils/textstyle.dart';
+import 'package:autowheelweb/desktop/prospect.dart';
 import 'package:autowheelweb/model/group.dart';
 import 'package:autowheelweb/model/prospect_modal.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
   final TextEditingController _contactController = TextEditingController();
   final TextEditingController _contactnumberController = TextEditingController();
   final TextEditingController _remarksController = TextEditingController();
+  final TextEditingController _actionController = TextEditingController();
   final TextEditingController _appointmentDate = TextEditingController(
     text: DateFormat('yyyy/MM/dd').format(DateTime.now()),
   );
@@ -40,8 +43,12 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
   // int? selectedVisitorId;
 
   //Priority
-   final List<Map<String, dynamic>> priorityDataList = [ {'id': 0, 'name': 'Cold'},{'id': 1, 'name': 'Normal'},{'id': 2, 'name': 'Hot'}];
-  int selectedPriorityId = 0;
+   final List<Map<String, dynamic>> priorityDataList = [ {'id': 3, 'name': 'Hot'},{'id': 2, 'name': 'Worm'},{'id': 1, 'name': 'Cold'}];
+  int selectedPriorityId = 1;
+
+  //Priority
+   final List<Map<String, dynamic>> enqueryDataList = [ {'id': 105, 'name': 'In Process'},{'id': 106, 'name': 'Lost'},{'id': 107, 'name': 'Not Intrested'},{'id': 108, 'name': 'Sale Closed'},];
+  int selectedenqueryId = 105;
 
 //Data
 List getAllRemarkList = [];
@@ -69,15 +76,16 @@ List getAllRemarkList = [];
     }
   }
 
-  void startTimer() {
-    // ignore: prefer_const_constructors
-    Timer.periodic(Duration(minutes: 1), (Timer timer) {
-      setState(() {
-        _selectedTime = TimeOfDay.now();
-      });
+   void startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 10), (Timer timer) {
+      if (mounted) {
+        setState(() {
+          _selectedTime = TimeOfDay.now();
+        });
+      }
     });
   }
-
+  late Timer _timer;
   refreshData() async {
     await
     followtypeDeta();
@@ -92,6 +100,8 @@ List getAllRemarkList = [];
       _selectedTime = TimeOfDay.now();
       startTimer();
       followtypeDeta();
+      
+    startTimer();
       // customer();
       refreshData();
     });
@@ -113,7 +123,7 @@ List getAllRemarkList = [];
     _splController.clear();
     _remarksController.clear();
     _contactnumberController.clear();
-
+    _timer.cancel();
     super.dispose();
   }
 
@@ -148,7 +158,7 @@ List getAllRemarkList = [];
         // customerdataList.isEmpty
         //           ? Center(
         //   child: CircularProgressIndicator(),  )
-                  // :
+        // :
                   SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(
@@ -161,7 +171,7 @@ List getAllRemarkList = [];
                     setState(() {
                       PrefixData();
                     });
-                  }, labelText: "Ref.No"),
+                  }, labelText: "Reference No"),
                   SizedBox(height: Sizes.height * 0.02),
                     //  dropdownTextfield(
                     //       'Select customer',
@@ -207,7 +217,7 @@ List getAllRemarkList = [];
                     //         },
                     //       ),
                     //     ),
-                       textformfiles(_contactController,labelText: "Customer Name",maxLength: 10),
+                       textformfiles(_contactController,labelText: "Customer Name",readOnly: true,suffixIcon: Icon(Icons.speaker_notes_off)),
                
                           SizedBox(
                     height: Sizes.height * 0.02,
@@ -217,6 +227,8 @@ List getAllRemarkList = [];
                   textformfiles(_splController, labelText: "Special Remarks"),
                   SizedBox(height: Sizes.height * 0.02),
                   textformfiles(_remarksController, labelText: "Remarks"),
+                  SizedBox(height: Sizes.height * 0.02),
+                  textformfiles(_actionController, labelText: "Action Taken"),
                   SizedBox(height: Sizes.height * 0.02),
                 dropdownTextfield(
                   "Priority",
@@ -231,13 +243,38 @@ List getAllRemarkList = [];
                 );
               }).toList(), icon: Icon(
       Icons.keyboard_arrow_down_outlined
-    ),
-    isExpanded: true,
-    
+          ),
+          isExpanded: true,
+          
               onChanged: (selectedId) {
                 setState(() {
                   selectedPriorityId = selectedId!['id'];
                   log(selectedPriorityId.toString());
+                  // Call function to make API request
+                });
+              },
+            ),  ),
+                   SizedBox(height: Sizes.height * 0.02),
+                dropdownTextfield(
+                  "Enquery Type",
+                 DropdownButton<Map<String, dynamic>>(
+                underline: Container(),
+                value: enqueryDataList.firstWhere((item) => item['id'] == selectedenqueryId),
+              items: enqueryDataList.map((data) {
+                return DropdownMenuItem<Map<String, dynamic>>(
+                  value: data,
+                  child: Text(data['name'],
+        style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),),
+                );
+              }).toList(), icon: Icon(
+      Icons.keyboard_arrow_down_outlined
+          ),
+          isExpanded: true,
+          
+              onChanged: (selectedId) {
+                setState(() {
+                  selectedenqueryId = selectedId!['id'];
+                  log(selectedenqueryId.toString());
                   // Call function to make API request
                 });
               },
@@ -263,6 +300,7 @@ List getAllRemarkList = [];
                                         )).toList(), selectedfollowupValue,(value) {
                                       setState(() {
                                         selectedfollowupValue = value;
+                                        log('$followupid');
                                       });
                                     }, FollowupController, (value) {
                                             setState(() {
@@ -354,26 +392,95 @@ List getAllRemarkList = [];
                   InkWell(
                       onTap: () {
                         postFollowUp(context);
-                        // updateTableValues();
-                        // _contactController.clear();
-                        // _remarksController.clear();
-                        // datepickar.clear();
                       },
                       child: Button("Save", AppColor.colPrimary)),
                   SizedBox(
                     height: Sizes.height * 0.02
                   ),
-                  Button("Delete", AppColor.colRideFare),
+                 getAllRemarkList.length != 0? InkWell(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                      ProspectScreen(refrenceNumber: _refController.text.isNotEmpty? int.parse(_refController.text.toString()):0,)
+                    ));
+                  },
+                    child: Button("Edit", AppColor.colRideFare)):Container(),
                    SizedBox(
                     height: Sizes.height * 0.02
                   ),
-                ...List.generate(getAllRemarkList.length, (index) {
-                  return ListTile(
-            leading:Text("${index+1}"),
-            title:Text("Last Remark : ${getAllRemarkList[index]['remarks']}"),
-            trailing: Text('${getAllRemarkList[index]['contacted_Date']}'.substring(0, getAllRemarkList[index]['lastContact_Date'].length!=null?getAllRemarkList[index]['lastContact_Date'].length - 12:0)),
+                  
+              ...List.generate(
+                  getAllRemarkList != null ? getAllRemarkList.length : 0,
+                      (index) {
+                      if (getAllRemarkList != null && getAllRemarkList.isNotEmpty) {
+                    return InkWell(
+                     onLongPress: (){
+                    showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Delete Follow Up'),
+                      content: Text("Are you sure you want to delete this follow up from the list?"),
+                         
+                      actions: <Widget>[
+                        TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Closes the dialog
+                },
+                child: const Text('No'),
+                        ),
+                        TextButton(
+                onPressed: () {
+                  deleteFollowUp(getAllRemarkList[index]['id']);
+                  setState(() {
+                    
+                    PrefixData().then((value) { setState(() {
+                      Navigator.pop(context);
+                    }); });
+                  });
+
+                },
+                child: const Text('Yes'),
+                        ),
+                      ],
+                    ),
                   );
-                })
+                      
+              },
+                      child: Card(
+                          child: Column(
+                             children: [
+
+                                ListTile(
+                dense: true,
+                leading: Text("Contact Date :",style: rubikTextStyle(14, FontWeight.w500, AppColor.colBlack),),
+                title: Text('${getAllRemarkList[index]['contacted_Date']}'.substring(
+                    0,
+                    getAllRemarkList[index]['contacted_Date']?.length != null
+                        ? getAllRemarkList[index]['contacted_Date'].length - 12
+                        : 0,
+                  ),style: rubikTextStyle(14, FontWeight.w400, AppColor.colLabel),),
+                  trailing: Text("${index+1}",style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),),
+              ),
+         
+              ListTile(
+                dense: true,
+                leading: Text("Last Remark :",style: rubikTextStyle(14, FontWeight.w500, AppColor.colBlack),),
+                title: Text("${getAllRemarkList[index]['remarks']}",style: rubikTextStyle(14, FontWeight.w400, AppColor.colLabel),),
+              ),
+              ListTile(
+                dense: true,
+                leading: Text("Action Taken :",style: rubikTextStyle(14, FontWeight.w500, AppColor.colBlack),),
+                title: Text("${getAllRemarkList[index]['actionTaken']}",style: rubikTextStyle(14, FontWeight.w400, AppColor.colLabel),),
+                           ),
+           ],
+          ),
+        ),
+      );
+          } else {
+      return Container();
+          }
+        },
+      )
+      
                 ],
               ),
             ),
@@ -403,36 +510,30 @@ List getAllRemarkList = [];
       print('Error: $e');
     }
   }
-
-  // Future<void> customer() async {
-  //   final response = await http.get(
-  //       Uri.parse('http://lms.muepetro.com/api/UserController1/GetProspect'));
-
-  //   if (response.statusCode == 200) {
-  //     final List<dynamic> decodedList = json.decode(response.body);
-      
-  //     getAlldataList = decodedList;
-  //     final List<Map<String, dynamic>> mappedList =
-  //         List<Map<String, dynamic>>.from(decodedList);
-
-  //     setState(() {
-  //       customerdataList = mappedList;
-  //       if (customerdataList.isNotEmpty) {
-  //         // selectedVisitorName = customerdataList[0]['customer_Name'];
-  //         selectedVisitorId = customerdataList[0]['id'];
-  //       }
-  //     });
-  //   } else {
-  //     throw Exception('Failed to load data');
-  //   }
-  // }
-
-
+void deleteFollowUp(int? id) async {
+  try {
+    await ApiService.postData("DeleteFollowUp?ID=$id", {
+      'ID': id
+    });
+    setState(() {
+      // Remove the deleted item from the list
+      getAllRemarkList.removeWhere((item) => item['id'] == id);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Follow-up deleted successfully'),
+    ));
+  } catch (error) {
+    print('Error deleting follow-up: $error');
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Failed to delete follow-up'),
+    ));
+  }
+}
   void postFollowUp(BuildContext context) async {
     final String apiUrl =
         "http://lms.muepetro.com/api/UserController1/PostFollowUp";
     Map<String, dynamic> followUpData = {
-      "Location_Id": 12,
+      "Location_Id": 2,
       "Prefix_Name": "online",
       "Ref_No": int.parse(_refController.text),
       "Customer_Name": _contactController.text.toString(),
@@ -443,9 +544,9 @@ List getAllRemarkList = [];
       "Appointment_Time": "${_selectedTime.hour}:${_selectedTime.minute}",
       "Remarks": _remarksController.text.toString(),
       "Remark_Special": _splController.text.toString(),
-      "ActionTaken": "Not Set Yet",
+      "ActionTaken": _actionController.text.toString(),
       "Priority": selectedPriorityId,
-      "EnquiryStatus": 1,
+      "EnquiryStatus": selectedenqueryId,
       "Reason": "Not Set Yet",
       "VehiclePurchase": "Not Set Yet"
     };
@@ -458,6 +559,7 @@ List getAllRemarkList = [];
         body: jsonEncode(followUpData),
       );
       if (response.statusCode == 200) {
+        PrefixData();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(response.body),
@@ -493,15 +595,17 @@ List getAllRemarkList = [];
         List<dynamic> dataList = json.decode(response.body);
 
         if (dataList.isNotEmpty) {
+          setState(() {
+            
                getAllRemarkList = dataList;
+          });
           Map<String, dynamic> data = dataList[0];
 
           setState(() {
             _contactController.text = data['customer_Name'] ?? '';
             _contactnumberController.text = data['mob_No'] ?? '';
-            _remarksController.text = data['remarks'] ?? '';
             _splController.text = data['remark_Special'] ?? '';
-            selectedPriorityId = int.parse(data['priority'])??0;
+            selectedPriorityId = int.parse(data['priority']);
             followupid = data['follow_Type'];
             // selectedVisitorId = 76;
             selectedfollowupValue = Folowtype.firstWhere(
@@ -515,9 +619,9 @@ List getAllRemarkList = [];
           });
         } else {
           _contactController.clear();
-          _remarksController.clear();
           _splController.clear();
           _contactnumberController.clear();
+          getAllRemarkList.clear();
         }
       } else {
         throw Exception('Failed to load data');

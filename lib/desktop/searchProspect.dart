@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:autowheelweb/Utils/colors.dart';
 import 'package:autowheelweb/Utils/mediaquery.dart';
 import 'package:autowheelweb/Utils/textfield.dart';
@@ -11,16 +13,16 @@ class SearchProspect extends StatefulWidget {
 }
 
 class _SearchProspectState extends State<SearchProspect> {
-  TextEditingController _mobileController = TextEditingController();
+  final TextEditingController _mobileController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
        appBar: AppBar( 
         leading: IconButton(onPressed: (){
           Navigator.pop(context);
-        }, icon: Icon(Icons.arrow_back_ios)),
+        }, icon: const Icon(Icons.arrow_back_ios)),
             centerTitle: true,
-        title: Text("Search Prospect", overflow: TextOverflow.ellipsis),
+        title: const Text("Search Prospect", overflow: TextOverflow.ellipsis),
       ),
       backgroundColor: AppColor.colWhite,
       body: Container(
@@ -30,7 +32,8 @@ class _SearchProspectState extends State<SearchProspect> {
            child: Padding(
             padding: EdgeInsets.symmetric(horizontal: Sizes.width * 0.05,vertical: Sizes.height*0.02),
              child: Column(children: [
-              textformfiles(_mobileController,labelText: 'Mobile No. / Customer Name',prefixIcon: Icon(Icons.search,size: 30,color: AppColor.colBlack,))
+              textformfiles(_mobileController,labelText: 'Mobile No. / Customer Name',prefixIcon: Icon(Icons.search,size: 30,color: AppColor.colBlack,)),
+              SizedBox(height: Sizes.height*0.02),            
              ],),
            ),
          ),

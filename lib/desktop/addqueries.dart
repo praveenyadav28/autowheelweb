@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
+
 import 'package:autowheelweb/Utils/api.dart';
 import 'package:autowheelweb/Utils/colors.dart';
 import 'package:autowheelweb/Utils/mediaquery.dart';
@@ -26,8 +28,8 @@ class _AddQueriesState extends State<AddQueries>with SingleTickerProviderStateMi
   @override
   void initState() {
     super.initState();
-     datepickar2 = widget.index==2? DateFormat('M/d/yyyy').format(DateTime.now()):DateFormat('M/d/yyyy').format(DateTime.now().add(Duration(days: 1)));
-    datepickar1 = widget.index==2? DateFormat('M/d/yyyy').format(DateTime.now()):DateFormat('M/d/yyyy').format(DateTime.now().add(Duration(days: 1)));
+     datepickar2 = widget.index==2? DateFormat('M/d/yyyy').format(DateTime.now()):DateFormat('M/d/yyyy').format(DateTime.now().add(const Duration(days: 1)));
+    datepickar1 = widget.index==2? DateFormat('M/d/yyyy').format(DateTime.now()):DateFormat('M/d/yyyy').format(DateTime.now().add(const Duration(days: 1)));
    
     allReportData(dateFrom:datepickar1.toString(), dateTo: datepickar2.toString()).then((value) {
       setState(() {
@@ -43,12 +45,12 @@ class _AddQueriesState extends State<AddQueries>with SingleTickerProviderStateMi
         appBar: AppBar( 
         leading: IconButton(onPressed: (){
           Navigator.pop(context);
-        }, icon: Icon(Icons.arrow_back_ios)),
+        }, icon: const Icon(Icons.arrow_back_ios)),
             centerTitle: true,
-        title: Text('Add Enquiries', overflow: TextOverflow.ellipsis), bottom: TabBar(
+        title: const Text('Add Enquiries', overflow: TextOverflow.ellipsis), bottom: TabBar(
           isScrollable: true,
           controller: _tabController,
-          tabs: [
+          tabs: const [
             Tab(text: 'Enquiry Punched Today',icon: Icon(Icons.calendar_month),),
             Tab(text: 'Tomarrow Follow-ups',icon: Icon(Icons.person),),
             Tab(text: "Today's Follow-ups",icon:  Icon(Icons.verified_user),),
@@ -114,7 +116,7 @@ class _AddQueriesState extends State<AddQueries>with SingleTickerProviderStateMi
       ),
     trailing: Row(mainAxisSize: MainAxisSize.min,
       children: [
-        Text("Hot "),
+        const Text("Hot "),
         Container(width: 13,height: 13,color: AppColor.colRideFare,),
       ],
     ),
@@ -144,7 +146,7 @@ class _AddQueriesState extends State<AddQueries>with SingleTickerProviderStateMi
       ),
     
             ),
-            trailing: SizedBox(width: 0,height: 0,),
+            trailing: const SizedBox(width: 0,height: 0,),
     children: [
     Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -193,7 +195,7 @@ class _AddQueriesState extends State<AddQueries>with SingleTickerProviderStateMi
                 ),
               );
             },
-            child: Text("View Details"),
+            child: const Text("View Details"),
           ),
         ],
       ),
@@ -280,7 +282,6 @@ class _AddQueriesState extends State<AddQueries>with SingleTickerProviderStateMi
           ),
         );
       } else {
-        print("Data fetched successfully");
       }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(

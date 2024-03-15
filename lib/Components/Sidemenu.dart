@@ -1,11 +1,13 @@
 // ignore_for_file: file_names, non_constant_identifier_names, prefer_typing_uninitialized_variables
 
+import 'package:autowheelweb/desktop/drawer/allprospact.dart';
+import 'package:autowheelweb/desktop/drawer/contactus.dart';
 import 'package:autowheelweb/desktop/dashboardScreen.dart';
+import 'package:autowheelweb/desktop/drawer/myaccount.dart';
 import 'package:autowheelweb/desktop/followup.dart';
 import 'package:autowheelweb/desktop/prospect.dart';
-import 'package:autowheelweb/desktop/report.dart';
+import 'package:autowheelweb/desktop/drawer/terms_conditions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../Utils/Colors.dart';
 import '../onboarding/Login.dart';
@@ -30,13 +32,13 @@ class _SideMenuState extends State<SideMenu> {
               DrawerHeader(child: Image.asset("assets/autowheellogo2.png",)),
               DrawerListtile(
                 onTap: () {
-                  // value.onChanged( DashboardScreen(),context);
+                  value.onChanged( const MyAccount(),context);
                 },
                 Title: "My Account",
               ),
               DrawerListtile(
                 onTap: () {
-                  value.onChanged( DashboardScreen(),context);
+                  value.onChanged( const DashboardScreen(),context);
                 },
                 Title: "Dashboard",
               ),
@@ -44,13 +46,13 @@ class _SideMenuState extends State<SideMenu> {
                 onTap: () {
                   value.onChanged( ProspectScreen(),context);
                 },
-                Title: "Prospect",
+                Title: "Add Prospect",
               ),
               DrawerListtile(
                 onTap: () {
-                  value.onChanged(const ReportScreen(),context);
+                  value.onChanged( const AllProspacts(),context);
                 },
-                Title: "Scheduled Report",
+                Title: "All Prospect",
               ),
               DrawerListtile(
                 onTap: () {
@@ -60,19 +62,13 @@ class _SideMenuState extends State<SideMenu> {
               ),
               DrawerListtile(
                 onTap: () {
-                  // value.onChanged(const ReportedUsers());
-                },
-                Title: "Closed Sale",
-              ),
-             DrawerListtile(
-                onTap: () {
-                  // value.onChanged(const AdminUsers());
+                  value.onChanged(const TermsConditions(),context);
                 },
                 Title: "Terms & Conditions",
               ),
               DrawerListtile(
                 onTap: () {
-                  // value.onChanged(const Message());
+                  value.onChanged(const ContactUs(),context);
                 },
                 Title: "Contact Us",
               ),

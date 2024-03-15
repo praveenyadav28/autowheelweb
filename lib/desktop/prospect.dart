@@ -20,7 +20,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
 class ProspectScreen extends StatefulWidget {
-  ProspectScreen({super.key});
+  ProspectScreen({this.refrenceNumber, super.key});
+  int ? refrenceNumber = 0;
   @override
   State<ProspectScreen> createState() => _ProspectScreenState();
 }
@@ -42,6 +43,9 @@ class _ProspectScreenState extends State<ProspectScreen> {
   final TextEditingController _lastRemarkController = TextEditingController();
   final TextEditingController _testRemarkController = TextEditingController();
   final TextEditingController _specialRemarkController = TextEditingController();
+  TextEditingController refController = TextEditingController();
+
+  
 
 
 //Date
@@ -85,11 +89,11 @@ final TextEditingController testController = TextEditingController();
 
 //Priority
 final List<Map<String, dynamic>> priorityDataList = [
-    {'id': 0, 'name': 'Cold'},
-    {'id': 1, 'name': 'Normal'},
-    {'id': 2, 'name': 'Hot'},
+    {'id': 1, 'name': 'Cold'},
+    {'id': 2, 'name': 'Normal'},
+    {'id': 3, 'name': 'Hot'},
   ];
-  int selectedPriorityId = 0; // Initially selected ID
+  int selectedPriorityId = 1; // Initially selected ID
 
   // final TextEditingController priorityController = TextEditingController();
   List<Map<String, dynamic>> product = [  ];
@@ -99,9 +103,9 @@ final List<Map<String, dynamic>> priorityDataList = [
   Map<String, dynamic>? selectedtestValue;
   int? testId;
 
-  List<Map<String, dynamic>> title = [ {'id': 0, 'name': 'Mr.'},{'id': 1, 'name': 'Mrs.'},{'id': 2, 'name': 'Dr.'},{'id': 3, 'name': 'M/S'}];
+  List<Map<String, dynamic>> title = [ {'id': 101, 'name': 'Mr.'},{'id': 102, 'name': 'Mrs.'},{'id': 103, 'name': 'Dr.'},{'id': 104, 'name': 'M/s'}];
   String selectedtitleName = "Mr.";
-  int selectedtitleId = 0;
+  int selectedtitleId = 101;
 
   List<String> options = [];
   List<Staffmodel> staffList = [];
@@ -136,7 +140,7 @@ final List<Map<String, dynamic>> priorityDataList = [
   }
    Timer? _timer;
   void startTimer() {
-   _timer = Timer.periodic(Duration(minutes: 1), (Timer timer) {
+   _timer = Timer.periodic(const Duration(minutes: 1), (Timer timer) {
       if (mounted) {
         setState(() {
         selectedTimeRefence = TimeOfDay.now();
@@ -152,7 +156,6 @@ final List<Map<String, dynamic>> priorityDataList = [
 
   List<String> datailsList1 = [];
   bool isLoading = false;
-  TextEditingController refController = TextEditingController();
   int ? locationId;
   List<Map<String, dynamic>> locationList = [];
   @override
@@ -169,7 +172,9 @@ final List<Map<String, dynamic>> priorityDataList = [
     occuptionData();
     productData();
     testData();
-    _fetchRefNo();
+    _fetchRefNo();  
+    refController = widget.refrenceNumber==0?refController: TextEditingController(text: widget.refrenceNumber.toString());
+  
   }
 
   refreshData() {
@@ -191,7 +196,9 @@ final List<Map<String, dynamic>> priorityDataList = [
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(  leading:
-         (!Responsive.isDesktop(context))
+      widget.refrenceNumber==0 || widget.refrenceNumber.toString().isNotEmpty ?IconButton(onPressed: (){
+        Navigator.pop(context);
+      }, icon: Icon(Icons.arrow_back_ios)):   (!Responsive.isDesktop(context))
             ? IconButton(
                 onPressed: context.read<MenuControlle>().controlMenu,
                 icon:   const Icon(Icons.menu))
@@ -203,304 +210,246 @@ final List<Map<String, dynamic>> priorityDataList = [
           style: TextStyle(color: AppColor.colWhite),
         ),
       ),
-      backgroundColor: AppColor.colPrimary.withOpacity(.1),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-              vertical: Sizes.height * 0.02, horizontal: Sizes.width * 0.04),
-          child: Column(
-            children: [
-              dropdownTextfield(
-                "Select Location",
-                localDropdownButton("Select a Location",
-                  context,
-                  locationId,
-                  locationList.map((value) {
-                    return DropdownMenuItem(
-                      value: value['id'],
-                      child: Text(
-                        '${value['location_Name']}',
-                        style: rubikTextStyle(
-                            16, FontWeight.w500, AppColor.colBlack),
-                      ),
-                    );
-                  }).toList(),
-                  (value) {
-                    setState(() {
-                      locationId = value as int;
-                      _fetchRefNo(); // Fetch reference number after location selection
-                    });
-                  },
-                ),
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              textformfiles(
-                refController,
-                keyboardType: TextInputType.number,
-                readOnly: true,
-                labelText: "Reference No",
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                      child: dropdownTextfield(
-                    "Date of Reference",
-                    InkWell(
-                      onTap: () async {
-                        DateTime date = DateTime(1900);
-                        FocusScope.of(context).requestFocus(FocusNode());
-                        await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(1900),
-                          lastDate: DateTime.now(),
-                        ).then((selectedDate) {
-                          if (selectedDate != null) {
-                            refDatePicker.text =
-                                DateFormat('M/d/yyyy').format(selectedDate);
-                          }
-                        });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            refDatePicker.text,
-                            style: rubikTextStyle(
-                                16, FontWeight.w500, AppColor.colBlack),
-                          ),
-                          Icon(Icons.edit_calendar, color: AppColor.colBlack)
-                        ],
-                      ),
-                    ),
-                  )),
-                  SizedBox(width: Sizes.width * 0.04),
-                  Expanded(
-                      child: dropdownTextfield(
-                    "Time of Reference",
-                    InkWell(
-                      onTap: () {
-                        _selectTimeReference(context);
-                      },
-                      child: Center(
+      backgroundColor: AppColor.colWhite,
+      body: Container(
+        color: AppColor.colPrimary.withOpacity(.1),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+                vertical: Sizes.height * 0.02, horizontal: Sizes.width * 0.04),
+            child: Column(
+              children: [
+                dropdownTextfield(
+                  "Select Location",
+                  localDropdownButton("Select a Location",
+                    context,
+                    locationId,
+                    locationList.map((value) {
+                      return DropdownMenuItem(
+                        value: value['id'],
                         child: Text(
-                          selectedTimeRefence.format(context),
+                          '${value['location_Name']}',
                           style: rubikTextStyle(
                               16, FontWeight.w500, AppColor.colBlack),
                         ),
-                      ),
-                    ),
-                  ))
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: dropdownTextfield(
-                        "Title",
-                        localDropdownButton("",
-                            context,
-                            selectedtitleName,
-                            title.map((item) {
-                              return DropdownMenuItem(
-                                value: item['name'],
-                                child: Text(
-                                  item['name'],
-                                  style: rubikTextStyle(
-                                      16, FontWeight.w500, AppColor.colBlack),
-                                ),
-                              );
-                            }).toList(), (value) {
-                          setState(() {
-                            selectedtitleName = value.toString();
-                            selectedtitleId = title
-                                    .firstWhere((item) => item['name'] == value)
-                                    .containsKey('id')
-                                ? title.firstWhere(
-                                    (item) => item['name'] == value)['id']
-                                : null;
-                            log(selectedtitleId.toString());
-                          });
-                        })),
+                      );
+                    }).toList(),
+                    (value) {
+                      setState(() {
+                        locationId = value as int;
+                        _fetchRefNo(); // Fetch reference number after location selection
+                      });
+                    },
                   ),
-                  SizedBox(width: Sizes.width * 0.04),
-                  Expanded(
-                    flex: 5,
-                    child:
-                        textformfiles(_customernameController, labelText: "Customer Name"),
-                  ),
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_sonoffController, labelText: "S/o"),
-              SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_addressController, labelText: "Address"),
-              SizedBox(height: Sizes.height * 0.02),
-              CSCPicker(
-                showStates: true,
-                showCities: true,
-                defaultCountry: CscCountry.India,
-                dropdownDecoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
-                    color: AppColor.colWhite,
-                    border: Border.all(
-                      width: 1,
-                      color: AppColor.colBlack
-                    )),
-                disabledDropdownDecoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
-                    color: AppColor.colWhite,
-                    border: Border.all(color: AppColor.colBlack, width: 1)),
-                countryDropdownLabel: "Select Country",
-                stateDropdownLabel: "Select State",
-                cityDropdownLabel: "Select City",
-                selectedItemStyle:
-                    rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),
-                dropdownHeadingStyle: TextStyle(
-                    color: AppColor.colBlack,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
-                dropdownItemStyle: TextStyle(
-                  color: AppColor.colBlack,
-                  fontSize: 14,
                 ),
-                dropdownDialogRadius: 10.0,
-                searchBarRadius: 10.0,
-                onCountryChanged: (value) {
-                  setState(() {
-                    cityValue;
-                    cityValue;
-                    "City";
-                    countryValue = value;
-                  });
-                },
-                onStateChanged: (value) {
-                  setState(() {
-                    stateValue = stateValue;
-                  });
-                },
-                onCityChanged: (value) {
-                  setState(() {
-                    cityValue = countryValue;
-                  });
-                },
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_pinController,
-                  labelText: "Pin Code", keyboardType: TextInputType.number),
-              SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_mobileController,
-                  labelText: "Mobile Number", keyboardType: TextInputType.number),
-              SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_emailController,
-                  keyboardType: TextInputType.emailAddress, labelText: "Email"),
-              SizedBox(height: Sizes.height * 0.02),
-              dropdownTextfield(
-                "Date of Birth",
-                InkWell(
-                  onTap: () async {
-                    DateTime date = DateTime(1900);
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime.now(),
-                    ).then((selectedDate) {
-                      if (selectedDate != null) {
-                        dobDatePicker.text =
-                            DateFormat('M/d/yyyy').format(selectedDate);
-                      }
+                SizedBox(height: Sizes.height * 0.02),
+                textformfiles(
+                  refController,
+                  keyboardType: TextInputType.number,
+                  readOnly: true,
+                  labelText: "Reference No",
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                Row(
+                  children: [
+                    Expanded(
+                        child: dropdownTextfield(
+                      "Date of Reference",
+                      InkWell(
+                        onTap: () async {
+                          DateTime date = DateTime(1900);
+                          FocusScope.of(context).requestFocus(FocusNode());
+                          await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                          ).then((selectedDate) {
+                            if (selectedDate != null) {
+                              refDatePicker.text =
+                                  DateFormat('M/d/yyyy').format(selectedDate);
+                            }
+                          });
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              refDatePicker.text,
+                              style: rubikTextStyle(
+                                  16, FontWeight.w500, AppColor.colBlack),
+                            ),
+                            Icon(Icons.edit_calendar, color: AppColor.colBlack)
+                          ],
+                        ),
+                      ),
+                    )),
+                    SizedBox(width: Sizes.width * 0.04),
+                    Expanded(
+                        child: dropdownTextfield(
+                      "Time of Reference",
+                      InkWell(
+                        onTap: () {
+                          _selectTimeReference(context);
+                        },
+                        child: Center(
+                          child: Text(
+                            selectedTimeRefence.format(context),
+                            style: rubikTextStyle(
+                                16, FontWeight.w500, AppColor.colBlack),
+                          ),
+                        ),
+                      ),
+                    ))
+                  ],
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: dropdownTextfield(
+                          "Title",
+                          localDropdownButton("",
+                              context,
+                              selectedtitleName,
+                              title.map((item) {
+                                return DropdownMenuItem(
+                                  value: item['name'],
+                                  child: Text(
+                                    item['name'],
+                                    style: rubikTextStyle(
+                                        16, FontWeight.w500, AppColor.colBlack),
+                                  ),
+                                );
+                              }).toList(), (value) {
+                            setState(() {
+                              selectedtitleName = value.toString();
+                              selectedtitleId = title
+                                      .firstWhere((item) => item['name'] == value)
+                                      .containsKey('id')
+                                  ? title.firstWhere(
+                                      (item) => item['name'] == value)['id']
+                                  : null;
+                              log(selectedtitleId.toString());
+                            });
+                          })),
+                    ),
+                    SizedBox(width: Sizes.width * 0.04),
+                    Expanded(
+                      flex: 5,
+                      child:
+                          textformfiles(_customernameController, labelText: "Customer Name"),
+                    ),
+                  ],
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_sonoffController, labelText: "S/o"),
+                SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_addressController, labelText: "Address"),
+                SizedBox(height: Sizes.height * 0.02),
+                CSCPicker(
+                  showStates: true,
+                  showCities: true,
+                  defaultCountry: CscCountry.India,
+                  dropdownDecoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(5)),
+                      color: AppColor.colWhite,
+                      border: Border.all(
+                        width: 1,
+                        color: AppColor.colBlack
+                      )),
+                  disabledDropdownDecoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(5)),
+                      color: AppColor.colWhite,
+                      border: Border.all(color: AppColor.colBlack, width: 1)),
+                  countryDropdownLabel: "Select Country",
+                  stateDropdownLabel: "Select State",
+                  cityDropdownLabel: "Select City",
+                  selectedItemStyle:
+                      rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),
+                  dropdownHeadingStyle: TextStyle(
+                      color: AppColor.colBlack,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                  dropdownItemStyle: TextStyle(
+                    color: AppColor.colBlack,
+                    fontSize: 14,
+                  ),
+                  dropdownDialogRadius: 10.0,
+                  searchBarRadius: 10.0,
+                  onCountryChanged: (value) {
+                    setState(() {
+                      cityValue;
+                      cityValue;
+                      "City";
+                      countryValue = value;
                     });
                   },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        dobDatePicker.text,
-                        style: rubikTextStyle(
-                            16, FontWeight.w500, AppColor.colBlack),
-                      ),
-                      Icon(Icons.edit_calendar, color: AppColor.colBlack)
-                    ],
+                  onStateChanged: (value) {
+                    setState(() {
+                      stateValue = stateValue;
+                    });
+                  },
+                  onCityChanged: (value) {
+                    setState(() {
+                      cityValue = countryValue;
+                    });
+                  },
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_pinController,
+                    labelText: "Pin Code", keyboardType: TextInputType.number),
+                SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_mobileController,
+                    labelText: "Mobile Number", keyboardType: TextInputType.number),
+                SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_emailController,
+                    keyboardType: TextInputType.emailAddress, labelText: "Email"),
+                SizedBox(height: Sizes.height * 0.02),
+                dropdownTextfield(
+                  "Date of Birth",
+                  InkWell(
+                    onTap: () async {
+                      DateTime date = DateTime(1900);
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime.now(),
+                      ).then((selectedDate) {
+                        if (selectedDate != null) {
+                          dobDatePicker.text =
+                              DateFormat('M/d/yyyy').format(selectedDate);
+                        }
+                      });
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          dobDatePicker.text,
+                          style: rubikTextStyle(
+                              16, FontWeight.w500, AppColor.colBlack),
+                        ),
+                        Icon(Icons.edit_calendar, color: AppColor.colBlack)
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                    child: dropdownTextfield(
-                        'Select Enquery Type',
-                        searchDropDown(
-                            'Select Enquery Type',
-                            Enqtype.map((item) => DropdownMenuItem(
-                                  onTap: () {
-                                    selectedEnqtypeId = item['id'];
-                                  },
-                                  value: item,
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        item['name'].toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                )).toList(),
-                            selectedEnqtypeValue,
-                            (value) {
-                              setState(() {
-                                selectedEnqtypeValue = value;
-                              });
-                            },
-                            EnqtypeController,
-                            (value) {
-                              setState(() {
-                                // Filter the Prionaity list based on the search value
-                                Enqtype.where((item) => item['name']
-                                    .toString()
-                                    .toLowerCase()
-                                    .contains(value.toLowerCase())).toList();
-                              });
-                            },
-                            'Search for a Enqtype...',
-                            (isOpen) {
-                              if (!isOpen) {
-                                EnqtypeController.clear();
-                              }
-                            })),
-                  ),
-                  SizedBox(width: Sizes.width * 0.04),
-                  addDefaultButton(() {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddGroupScreen(
-                                  sourecID: 18,
-                                  name: "Enquiry Type",
-                                ))).then((value) => refreshData());
-                  })
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                    child: dropdownTextfield(
-                      "Select Occuption",
-                      DropdownButtonHideUnderline(
-                          child: searchDropDown(
-                              "Select Occuption",
-                              Occuption.map((item) => DropdownMenuItem(
+                SizedBox(height: Sizes.height * 0.02),
+                Row(
+                  children: [
+                    Expanded(
+                      child: dropdownTextfield(
+                          'Select Enquery Type',
+                          searchDropDown(
+                              'Select Enquery Type',
+                              Enqtype.map((item) => DropdownMenuItem(
                                     onTap: () {
-                                      selectedOccuptionId = item['id'];
+                                      selectedEnqtypeId = item['id'];
                                     },
                                     value: item,
                                     child: Row(
@@ -514,120 +463,53 @@ final List<Map<String, dynamic>> priorityDataList = [
                                       ],
                                     ),
                                   )).toList(),
-                              selectedOccuptionValue,
+                              selectedEnqtypeValue,
                               (value) {
                                 setState(() {
-                                  selectedOccuptionValue = value;
+                                  selectedEnqtypeValue = value;
                                 });
                               },
-                              OccuptionController,
+                              EnqtypeController,
                               (value) {
                                 setState(() {
                                   // Filter the Prionaity list based on the search value
-                                  Occuption.where((item) => item['name']
+                                  Enqtype.where((item) => item['name']
                                       .toString()
                                       .toLowerCase()
                                       .contains(value.toLowerCase())).toList();
                                 });
                               },
-                              'Search for a Occuption...',
+                              'Search for a Enqtype...',
                               (isOpen) {
                                 if (!isOpen) {
-                                  OccuptionController.clear();
+                                  EnqtypeController.clear();
                                 }
                               })),
                     ),
-                  ),
-                  SizedBox(width: Sizes.width * 0.04),
-                  addDefaultButton(
-                    () {
+                    SizedBox(width: Sizes.width * 0.04),
+                    addDefaultButton(() {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => AddGroupScreen(
-                                    sourecID: 23,
-                                    name: "Occupation",
+                                    sourecID: 18,
+                                    name: "Enquiry Type",
                                   ))).then((value) => refreshData());
-                    },
-                  )
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                    child: dropdownTextfield(
-                      "Staff",
-                      Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: localDropdownButton( "Select Staff",
-                              context,
-                              selectedStaffId,
-                              options.map<DropdownMenuItem<String>>(
-                                (String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(
-                                      value,
-                                      style: rubikTextStyle(16, FontWeight.w500,
-                                          AppColor.colBlack),
-                                    ),
-                                  );
-                                },
-                              ).toList(), (var newValue) {
-                            setState(() {
-                              selectedStaffId = newValue.toString();
-                            });
-                          })),
-                    ),
-                  ),
-                  SizedBox(width: Sizes.width * 0.04),
-                  addDefaultButton(
-                    () {
-                      showDialog<void>(
-                        context: context,
-                        barrierDismissible: false, // user must tap button!
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title:
-                                const Text('This is no feature to add staff.'),
-                            content: const SingleChildScrollView(
-                              child: ListBody(
-                                children: <Widget>[
-                                  Text(
-                                      'It will work after some time. For more datails you can contect us'),
-                                ],
-                              ),
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                child: const Text('Ok'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                      // Navigator.push(context, MaterialPageRoute(builder: (context) => AddGroupScreen()))
-                      //       .then((value) => refreshData());
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                    child: dropdownTextfield(
-                        "Select Source",
-                        searchDropDown(
-                            "Select Source",
-                            drop
-                                .map((item) => DropdownMenuItem(
+                    })
+                  ],
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                Row(
+                  children: [
+                    Expanded(
+                      child: dropdownTextfield(
+                        "Select Occuption",
+                        DropdownButtonHideUnderline(
+                            child: searchDropDown(
+                                "Select Occuption",
+                                Occuption.map((item) => DropdownMenuItem(
                                       onTap: () {
-                                        selecteddropId = item['id'];
+                                        selectedOccuptionId = item['id'];
                                       },
                                       value: item,
                                       child: Row(
@@ -640,144 +522,344 @@ final List<Map<String, dynamic>> priorityDataList = [
                                           ),
                                         ],
                                       ),
-                                    ))
-                                .toList(),
-                            selecteddropValue,
-                            (value) {
-                              setState(() {
-                                selecteddropValue = value;
-                              });
-                            },
-                            dropController,
-                            (value) {
-                              setState(() {
-                                // Filter the Prionaity list based on the search value
-                                drop
-                                    .where((item) => item['name']
+                                    )).toList(),
+                                selectedOccuptionValue,
+                                (value) {
+                                  setState(() {
+                                    selectedOccuptionValue = value;
+                                  });
+                                },
+                                OccuptionController,
+                                (value) {
+                                  setState(() {
+                                    // Filter the Prionaity list based on the search value
+                                    Occuption.where((item) => item['name']
                                         .toString()
                                         .toLowerCase()
-                                        .contains(value.toLowerCase()))
-                                    .toList();
-                              });
-                            },
-                            'Search for a Source...',
-                            (isOpen) {
-                              if (!isOpen) {
-                                dropController.clear();
-                              }
-                            })),
-                  ),
-                  SizedBox(width: Sizes.width * 0.04),
-                  addDefaultButton(
-                    () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddGroupScreen(
-                                    sourecID: 10,
-                                    name: 'Source',
-                                  ))).then((value) => refreshData());
-                    },
-                  )
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              dropdownTextfield(
-                  "Priority",
-                 DropdownButton<int>(
-                underline: Container(),
-              value: selectedPriorityId,
-              items: priorityDataList.map((data) {
-                return DropdownMenuItem<int>(
-                  value: data['id'],
-                  child: Text(data['name'],
-        style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),),
-                );
-              }).toList(), icon: Icon(
-      Icons.keyboard_arrow_down_outlined
-    ),
-    isExpanded: true,
-    
-              onChanged: (selectedId) {
-                setState(() {
-                  selectedPriorityId = selectedId!;
-                  log(selectedPriorityId.toString());
-                  // Call function to make API request
-                });
-              },
-            ),  ),
-                             
-             SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_schemeController, labelText: "Scheme"),
-              SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_incomeController, labelText: "Income",keyboardType: TextInputType.number),
-              SizedBox(height: Sizes.height * 0.05),
-              Text(
-                "Intersted in following product",
-                style: rubikTextStyle(18, FontWeight.bold, AppColor.colBlack),
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                      child: dropdownTextfield(
-                    "Product",
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: localDropdownButton( "Select Product",
-                        context,
-                        selectedproductName,
-                        product.map((item) {
-                          return DropdownMenuItem(
-                            value: item['name'],
-                            child: Text(
-                              item['name'],
-                              style: rubikTextStyle(
-                                  16, FontWeight.w500, AppColor.colBlack),
-                            ),
-                          );
-                        }).toList(),
-                        (value) {
-                          setState(() {
-                            selectedproductName = value.toString();
-                            selectedproductId = product
-                                    .firstWhere((item) => item['name'] == value)
-                                    .containsKey('id')
-                                ? product.firstWhere(
-                                    (item) => item['name'] == value)['id']
-                                : null;
-                            log(selectedproductId.toString());
-                          });
-                        },
+                                        .contains(value.toLowerCase())).toList();
+                                  });
+                                },
+                                'Search for a Occuption...',
+                                (isOpen) {
+                                  if (!isOpen) {
+                                    OccuptionController.clear();
+                                  }
+                                })),
                       ),
                     ),
-                  )),
-                  SizedBox(width: Sizes.width * 0.04),
-                  addDefaultButton(
-                    () {
-                      Navigator.push(
+                    SizedBox(width: Sizes.width * 0.04),
+                    addDefaultButton(
+                      () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddGroupScreen(
+                                      sourecID: 23,
+                                      name: "Occupation",
+                                    ))).then((value) => refreshData());
+                      },
+                    )
+                  ],
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                Row(
+                  children: [
+                    Expanded(
+                      child: dropdownTextfield(
+                        "Staff",
+                        Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: localDropdownButton( "Select Staff",
+                                context,
+                                selectedStaffId,
+                                options.map<DropdownMenuItem<String>>(
+                                  (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                        value,
+                                        style: rubikTextStyle(16, FontWeight.w500,
+                                            AppColor.colBlack),
+                                      ),
+                                    );
+                                  },
+                                ).toList(), (var newValue) {
+                              setState(() {
+                                selectedStaffId = newValue.toString();
+                              });
+                            })),
+                      ),
+                    ),
+                    SizedBox(width: Sizes.width * 0.04),
+                    addDefaultButton(
+                      () {
+                        showDialog<void>(
+                          context: context,
+                          barrierDismissible: false, // user must tap button!
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title:
+                                  const Text('This is no feature to add staff.'),
+                              content: const SingleChildScrollView(
+                                child: ListBody(
+                                  children: <Widget>[
+                                    Text(
+                                        'It will work after some time. For more datails you can contect us'),
+                                  ],
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('Ok'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        // Navigator.push(context, MaterialPageRoute(builder: (context) => AddGroupScreen()))
+                        //       .then((value) => refreshData());
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                Row(
+                  children: [
+                    Expanded(
+                      child: dropdownTextfield(
+                          "Select Source",
+                          searchDropDown(
+                              "Select Source",
+                              drop
+                                  .map((item) => DropdownMenuItem(
+                                        onTap: () {
+                                          selecteddropId = item['id'];
+                                        },
+                                        value: item,
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              item['name'].toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ))
+                                  .toList(),
+                              selecteddropValue,
+                              (value) {
+                                setState(() {
+                                  selecteddropValue = value;
+                                });
+                              },
+                              dropController,
+                              (value) {
+                                setState(() {
+                                  // Filter the Prionaity list based on the search value
+                                  drop
+                                      .where((item) => item['name']
+                                          .toString()
+                                          .toLowerCase()
+                                          .contains(value.toLowerCase()))
+                                      .toList();
+                                });
+                              },
+                              'Search for a Source...',
+                              (isOpen) {
+                                if (!isOpen) {
+                                  dropController.clear();
+                                }
+                              })),
+                    ),
+                    SizedBox(width: Sizes.width * 0.04),
+                    addDefaultButton(
+                      () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddGroupScreen(
+                                      sourecID: 10,
+                                      name: 'Source',
+                                    ))).then((value) => refreshData());
+                      },
+                    )
+                  ],
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                dropdownTextfield(
+                    "Priority",
+                   DropdownButton<int>(
+                  underline: Container(),
+                value: selectedPriorityId,
+                items: priorityDataList.map((data) {
+                  return DropdownMenuItem<int>(
+                    value: data['id'],
+                    child: Text(data['name'],
+          style: rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),),
+                  );
+                }).toList(), icon: const Icon(
+        Icons.keyboard_arrow_down_outlined
+            ),
+            isExpanded: true,
+            
+                onChanged: (selectedId) {
+                  setState(() {
+                    selectedPriorityId = selectedId!;
+                    log(selectedPriorityId.toString());
+                    // Call function to make API request
+                  });
+                },
+              ),  ),
+                               
+               SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_schemeController, labelText: "Scheme"),
+                SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_incomeController, labelText: "Income",keyboardType: TextInputType.number),
+                SizedBox(height: Sizes.height * 0.05),
+                Text(
+                  "Intersted in following product",
+                  style: rubikTextStyle(18, FontWeight.bold, AppColor.colBlack),
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                Row(
+                  children: [
+                    Expanded(
+                        child: dropdownTextfield(
+                      "Product",
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: localDropdownButton( "Select Product",
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => AddGroupScreen(
-                                    sourecID: 19,
-                                    name: 'Product',
-                                  ))).then((value) => refreshData());
-                    },
-                  )
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                    child: dropdownTextfield(
-                      "Select Color",
-                      searchDropDown(
+                          selectedproductName,
+                          product.map((item) {
+                            return DropdownMenuItem(
+                              value: item['name'],
+                              child: Text(
+                                item['name'],
+                                style: rubikTextStyle(
+                                    16, FontWeight.w500, AppColor.colBlack),
+                              ),
+                            );
+                          }).toList(),
+                          (value) {
+                            setState(() {
+                              selectedproductName = value.toString();
+                              selectedproductId = product
+                                      .firstWhere((item) => item['name'] == value)
+                                      .containsKey('id')
+                                  ? product.firstWhere(
+                                      (item) => item['name'] == value)['id']
+                                  : null;
+                              log(selectedproductId.toString());
+                            });
+                          },
+                        ),
+                      ),
+                    )),
+                    SizedBox(width: Sizes.width * 0.04),
+                    addDefaultButton(
+                      () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddGroupScreen(
+                                      sourecID: 19,
+                                      name: 'Product',
+                                    ))).then((value) => refreshData());
+                      },
+                    )
+                  ],
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                Row(
+                  children: [
+                    Expanded(
+                      child: dropdownTextfield(
                         "Select Color",
-                        color
-                            .map((item) => DropdownMenuItem(
+                        searchDropDown(
+                          "Select Color",
+                          color
+                              .map((item) => DropdownMenuItem(
+                                    onTap: () {
+                                      selectedcolorsId = item['id'];
+                                    },
+                                    value: item,
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          item['name'].toString(),
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ))
+                              .toList(),
+                          selectedcolorValue,
+                          (value) {
+                            setState(() {
+                              selectedcolorValue = value;
+                            });
+                          },
+                          color2Controller,
+                          (value) {
+                            setState(() {
+                              // Filter the Prionaity list based on the search value
+                              color
+                                  .where((item) => item['name']
+                                      .toString()
+                                      .toLowerCase()
+                                      .contains(value.toLowerCase()))
+                                  .toList();
+                            });
+                          },
+                          'Search for a color...',
+                          (isOpen) {
+                            if (!isOpen) {
+                              colorController.clear();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: Sizes.width * 0.04),
+                    addDefaultButton(
+                      () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddGroupScreen(
+                                      sourecID: 17,
+                                      name: 'Color',
+                                    ))).then((value) => refreshData());
+                      },
+                    )
+                  ],
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_intrestedremarksController, labelText: "Remarks"),
+                SizedBox(height: Sizes.height * 0.05),
+                Text(
+                  "Test Ride",
+                  style: rubikTextStyle(18, FontWeight.bold, AppColor.colBlack),
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                Row(
+                  children: [
+                    Expanded(
+                      child: dropdownTextfield(
+                        "Select Test",
+                        searchDropDown(
+                            'Select Test',
+                            Test.map((item) => DropdownMenuItem(
                                   onTap: () {
-                                    selectedcolorsId = item['id'];
+                                    testId = item['id'];
                                   },
                                   value: item,
                                   child: Row(
@@ -790,245 +872,153 @@ final List<Map<String, dynamic>> priorityDataList = [
                                       ),
                                     ],
                                   ),
-                                ))
-                            .toList(),
-                        selectedcolorValue,
-                        (value) {
-                          setState(() {
-                            selectedcolorValue = value;
-                          });
-                        },
-                        color2Controller,
-                        (value) {
-                          setState(() {
-                            // Filter the Prionaity list based on the search value
-                            color
-                                .where((item) => item['name']
+                                )).toList(),
+                            selectedtestValue,
+                            (value) {
+                              setState(() {
+                                selectedtestValue = value;
+                              });
+                            },
+                            testController,
+                            (value) {
+                              setState(() {
+                                // Filter the Prionaity list based on the search value
+                                Test.where((item) => item['name']
                                     .toString()
                                     .toLowerCase()
-                                    .contains(value.toLowerCase()))
-                                .toList();
-                          });
-                        },
-                        'Search for a color...',
-                        (isOpen) {
-                          if (!isOpen) {
-                            colorController.clear();
-                          }
-                        },
+                                    .contains(value.toLowerCase())).toList();
+                              });
+                            },
+                            'Search for a Test...',
+                            (isOpen) {
+                              if (!isOpen) {
+                                testController.clear();
+                              }
+                            }),
                       ),
                     ),
-                  ),
-                  SizedBox(width: Sizes.width * 0.04),
-                  addDefaultButton(
-                    () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddGroupScreen(
-                                    sourecID: 17,
-                                    name: 'Color',
-                                  ))).then((value) => refreshData());
-                    },
-                  )
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_intrestedremarksController, labelText: "Remarks"),
-              SizedBox(height: Sizes.height * 0.05),
-              Text(
-                "Test Ride",
-                style: rubikTextStyle(18, FontWeight.bold, AppColor.colBlack),
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                    child: dropdownTextfield(
-                      "Select Test",
-                      searchDropDown(
-                          'Select Test',
-                          Test.map((item) => DropdownMenuItem(
-                                onTap: () {
-                                  testId = item['id'];
-                                },
-                                value: item,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      item['name'].toString(),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              )).toList(),
-                          selectedtestValue,
-                          (value) {
-                            setState(() {
-                              selectedtestValue = value;
-                            });
-                          },
-                          testController,
-                          (value) {
-                            setState(() {
-                              // Filter the Prionaity list based on the search value
-                              Test.where((item) => item['name']
-                                  .toString()
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase())).toList();
-                            });
-                          },
-                          'Search for a Test...',
-                          (isOpen) {
-                            if (!isOpen) {
-                              testController.clear();
-                            }
-                          }),
-                    ),
-                  ),
-                  SizedBox(width: Sizes.width * 0.04),
-                  addDefaultButton(
-                    () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddGroupScreen(
-                                    sourecID: 21,
-                                    name: 'Test',
-                                  ))).then((value) => refreshData());
-                    },
-                  )
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              dropdownTextfield(
-                "Test Ride Date",
-                InkWell(
-                  onTap: () async {
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2200),
-                    ).then((selectedDate) {
-                      if (selectedDate != null) {
-                        rideDatePickar.text =
-                            DateFormat('M/d/yyyy').format(selectedDate);
-                      }
-                    });
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        rideDatePickar.text,
-                        style: rubikTextStyle(
-                            16, FontWeight.w500, AppColor.colBlack),
-                      ),
-                      Icon(Icons.edit_calendar, color: AppColor.colBlack)
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_testRemarkController, labelText: "Remarks"),
-              SizedBox(height: Sizes.height * 0.05),
-              Text(
-                "Appointment Date and Time*",
-                style: rubikTextStyle(18, FontWeight.bold, AppColor.colBlack),
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              Row(
-                children: [
-                  Expanded(
-                    child: dropdownTextfield(
-                      "Appointment Date",
-                      InkWell(
-                        onTap: () async {
-                          FocusScope.of(context).requestFocus(FocusNode());
-                          await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2200),
-                          ).then((selectedDate) {
-                            if (selectedDate != null) {
-                              appointmentDatePickar.text =
-                                  DateFormat('M/d/yyyy').format(selectedDate);
-                            }
-                          });
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              appointmentDatePickar.text,
-                              style: rubikTextStyle(
-                                  16, FontWeight.w500, AppColor.colBlack),
-                            ),
-                            Icon(Icons.edit_calendar, color: AppColor.colBlack)
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: Sizes.width * 0.04),
-                  Expanded(
-                      child: dropdownTextfield(
-                    "Appointment Time",
-                    InkWell(
-                      onTap: () {
-                        _selectTimeAppointment(context);
+                    SizedBox(width: Sizes.width * 0.04),
+                    addDefaultButton(
+                      () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddGroupScreen(
+                                      sourecID: 21,
+                                      name: 'Test',
+                                    ))).then((value) => refreshData());
                       },
-                      child: Center(
-                        child: Text(
-                          selectedTimeAppointment.format(context),
+                    )
+                  ],
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                dropdownTextfield(
+                  "Test Ride Date",
+                  InkWell(
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2200),
+                      ).then((selectedDate) {
+                        if (selectedDate != null) {
+                          rideDatePickar.text =
+                              DateFormat('M/d/yyyy').format(selectedDate);
+                        }
+                      });
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          rideDatePickar.text,
                           style: rubikTextStyle(
                               16, FontWeight.w500, AppColor.colBlack),
                         ),
+                        Icon(Icons.edit_calendar, color: AppColor.colBlack)
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_testRemarkController, labelText: "Remarks"),
+                SizedBox(height: Sizes.height * 0.05),
+                Text(
+                  "Appointment Date and Time*",
+                  style: rubikTextStyle(18, FontWeight.bold, AppColor.colBlack),
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                Row(
+                  children: [
+                    Expanded(
+                      child: dropdownTextfield(
+                        "Appointment Date",
+                        InkWell(
+                          onTap: () async {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(2200),
+                            ).then((selectedDate) {
+                              if (selectedDate != null) {
+                                appointmentDatePickar.text =
+                                    DateFormat('M/d/yyyy').format(selectedDate);
+                              }
+                            });
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                appointmentDatePickar.text,
+                                style: rubikTextStyle(
+                                    16, FontWeight.w500, AppColor.colBlack),
+                              ),
+                              Icon(Icons.edit_calendar, color: AppColor.colBlack)
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ))
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_lastRemarkController, labelText: "Last Remarks"),
-             SizedBox(height: Sizes.height * 0.02),
-              textformfiles(_specialRemarkController, labelText: "Special Remarks"),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 30,
-                    child: Checkbox(
-                        activeColor: AppColor.colPrimary,
-                        value: ischack,
-                        onChanged: (e) {
-                          setState(() {
-                            ischack = !ischack;
-                          });
-                        }),
-                  ),
-                  Text(
-                    "Sent an SMS after Save",
-                    style:
-                        rubikTextStyle(16, FontWeight.w500, AppColor.colBlack),
-                  )
-                ],
-              ),
-              SizedBox(height: Sizes.height * 0.02),
-              InkWell(
-                  onTap: () {
-                    postProspect();
-                    getLocation();
-                  },
-                  child: Button("Save", AppColor.colPrimary)),
-              SizedBox(height: Sizes.height * 0.02),
-              Button("Delete", AppColor.colRideFare),
-              SizedBox(height: Sizes.height * 0.02),
-            ],
+                    SizedBox(width: Sizes.width * 0.04),
+                    Expanded(
+                        child: dropdownTextfield(
+                      "Appointment Time",
+                      InkWell(
+                        onTap: () {
+                          _selectTimeAppointment(context);
+                        },
+                        child: Center(
+                          child: Text(
+                            selectedTimeAppointment.format(context),
+                            style: rubikTextStyle(
+                                16, FontWeight.w500, AppColor.colBlack),
+                          ),
+                        ),
+                      ),
+                    ))
+                  ],
+                ),
+                SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_lastRemarkController, labelText: "Last Remarks"),
+               SizedBox(height: Sizes.height * 0.02),
+                textformfiles(_specialRemarkController, labelText: "Special Remarks"),
+                SizedBox(height: Sizes.height * 0.02),
+                InkWell(
+                    onTap: () {
+                      postProspect();
+                      getLocation();
+                    },
+                    child: Button("Save", AppColor.colPrimary)),
+                SizedBox(height: Sizes.height * 0.02),
+                // Button("Delete", AppColor.colRideFare),
+                // SizedBox(height: Sizes.height * 0.02),
+              ],
+            ),
           ),
         ),
       ),
@@ -1177,7 +1167,7 @@ final List<Map<String, dynamic>> priorityDataList = [
       "CurrentAppointmentDate": appointmentDatePickar.text,
       "EnquiryStatus": 1,
       "Last_Remark": _lastRemarkController.text.toString(),
-      "LastContact_Date": appointmentDatePickar.text,
+      "LastContact_Date": DateFormat('M/d/yyyy').format(DateTime.now()),
     };
     // log(message)
     String jsonString = jsonEncode(postData);
@@ -1192,7 +1182,7 @@ final List<Map<String, dynamic>> priorityDataList = [
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(" ${ data}"),
+          content: Text(" $data"),
           backgroundColor: Colors.green,
         ));
       } else {

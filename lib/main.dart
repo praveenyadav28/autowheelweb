@@ -1,17 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:autowheelweb/Components/fullscreen.dart';
 import 'package:autowheelweb/Components/menuController.dart';
 import 'package:autowheelweb/Utils/Colors.dart';
-import 'package:autowheelweb/Utils/dummy.dart';
 import 'package:autowheelweb/Utils/mediaquery.dart';
-import 'package:autowheelweb/onboarding/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());

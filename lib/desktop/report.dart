@@ -557,9 +557,9 @@ Future<void> getLocation() async {
       // sheetObject.cell(CellIndex.indexByString("K${index + 2}")).value =
       //     dateList[index]?["priority"] ?? 'N/A';
       sheetObject.cell(CellIndex.indexByString("A${index + 2}"))
-    ..value = dateList[index]?["customer_Name"] ?? 'N/A';
+    .value = dateList[index]?["customer_Name"] ?? 'N/A';
 sheetObject.cell(CellIndex.indexByString("B${index + 2}"))
-    ..value = dateList[index]?["salesPerson"] ?? 'N/A';
+    .value = dateList[index]?["salesPerson"] ?? 'N/A';
     }
 
     // Save the Excel file

@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class ApiService {
   static const String baseUrl = "http://lms.muepetro.com/api/UserController1";
 
-  static Future<List<dynamic>> fetchData(String endpoint) async {
+  static Future fetchData(String endpoint) async {
     final response = await http.get(Uri.parse('$baseUrl/$endpoint'));
 
     if (response.statusCode == 200) {
